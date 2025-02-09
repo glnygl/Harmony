@@ -9,7 +9,7 @@ import ComposableArchitecture
 
 @Reducer
 struct AppFeature {
-
+  
   enum SelectedTab {
       case list
       case favorites
@@ -34,12 +34,7 @@ struct AppFeature {
       return .none
     }
 
-    Scope(state: \.listState, action: \.listAction) {
-     TrackListFeature()
-    }
-    
-    Scope(state: \.favoritesState, action: \.favoritesAction) {
-      FavoritesFeature()
-    }
+    Scope(state: \.listState, action: \.listAction) { TrackListFeature() }
+    Scope(state: \.favoritesState, action: \.favoritesAction) { FavoritesFeature() }
   }
 }

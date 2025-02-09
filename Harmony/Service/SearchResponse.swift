@@ -6,13 +6,21 @@
 //
 
 struct SearchResponse: Codable {
-    let results: [TracksResponse]
+    let results: [TrackResponse]
 }
 
-struct TracksResponse: Codable {
+struct TrackResponse: Codable, Equatable {
+    let id: Int
+    let img: String?
+    let url: String?
     let trackName: String?
-    let artworkUrl100: String?
-    let collectionName: String?
     let artistName: String?
-    var previewUrl: String?
+    let collectionName: String?
+
+  enum CodingKeys: String, CodingKey {
+    case id = "trackId"
+    case img = "artworkUrl100"
+    case url = "previewUrl"
+    case trackName, artistName, collectionName
+  }
 }
