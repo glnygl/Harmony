@@ -46,18 +46,6 @@ struct TrackListView: View {
   }
 }
 
-struct SearchResultRow: View {
-  let result: TrackResponse
-
-  var body: some View {
-    VStack(alignment: .leading) {
-      Text(result.trackName ?? "")
-        .font(.headline)
-    }
-    .padding(.vertical, 4)
-  }
-}
-
 #Preview {
   TrackListView(
     store: Store(initialState: TrackListFeature.State()) {

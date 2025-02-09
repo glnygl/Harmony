@@ -16,7 +16,7 @@ protocol MusicPlayerProtocol {
   func seek(to time: Double)
   func currentTime() -> Double
   func duration() -> Double
-  func setMusicURL(_ urlString: String) throws
+  func setURL(_ urlString: String) throws
 }
 
 final class MusicPlayerService: MusicPlayerProtocol {
@@ -26,7 +26,7 @@ final class MusicPlayerService: MusicPlayerProtocol {
     self.audioPlayer = audioPlayer
   }
 
-  func setMusicURL(_ urlString: String) throws {
+  func setURL(_ urlString: String) throws {
     guard let url = URL(string: urlString) else { throw "Music url not found"}
     do {
       let data = try Data(contentsOf: url)
@@ -60,4 +60,5 @@ final class MusicPlayerService: MusicPlayerProtocol {
   func duration() -> Double {
     return audioPlayer.duration
   }
+
 }

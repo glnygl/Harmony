@@ -127,6 +127,11 @@ struct TrackDetailView: View {
     .onAppear {
       store.send(.setMusicURL(store.track.url ?? ""))
     }
+    .onReceive(Timer.publish(every: 1, on: .main, in: .default).autoconnect()) { _ in
+      if store.isPlaying {
+        store.send(.updateTime(store.currentTime + 1))
+        }
+    }
   }
 }
 

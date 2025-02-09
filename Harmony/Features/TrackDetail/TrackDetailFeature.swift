@@ -26,10 +26,8 @@ struct TrackDetailFeature {
     case seek(Double)
     case updateVolume(Double)
     case updateTime(Double)
-    case setTime(Double, Double)
+    case setInitialTime(Double, Double)
     case playerFinished
-    case startTimer
-    case invalidateTimer
     case dismissButtonTapped
   }
 
@@ -42,8 +40,8 @@ struct TrackDetailFeature {
         state.musicURL = url
         return .run { send in
           do {
-            try musicPlayer.setMusicURL(url)
-            await send(.setTime(musicPlayer.currentTime(), musicPlayer.duration()))
+            try musicPlayer.setURL(url)
+            await send(.setInitialTime(musicPlayer.currentTime(), musicPlayer.duration()))
           } catch {
             print(error)
           }
@@ -60,17 +58,20 @@ struct TrackDetailFeature {
         state.volume = volume
         musicPlayer.setVolume(volume)
         return .none
-      case .setTime(let current, let duration):
+      case .setInitialTime(let current, let duration):
         state.currentTime = current
         state.totalDuration = duration
         return .none
       case .seek(let current):
-         musicPlayer.seek(to: current)
-         state.currentTime = current
-         return .none
-      case .updateTime(let current):
-        state.currentTime = musicPlayer.currentTime()
+        state.currentTime = current
+        musicPlayer.seek(to: current)
         return .none
+      case let .updateTime(time):
+          state.currentTime = time
+          if time >= state.totalDuration {
+            state.isPlaying = false
+          }
+          return .none
       default:
         return .none
       }
