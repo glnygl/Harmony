@@ -35,8 +35,13 @@ struct TrackListRowView: View {
           .font(.system(size: 14))
           .lineLimit(1)
           .foregroundStyle(.gray)
+
+        Text(track.collectionName ?? "")
+          .font(.system(size: 14))
+          .lineLimit(1)
+          .foregroundStyle(.gray)
       }
-      .padding(.leading, 8)
+      .padding(.leading, 4)
     }
   }
 }

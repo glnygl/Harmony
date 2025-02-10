@@ -67,11 +67,11 @@ struct TrackDetailFeature {
         musicPlayer.seek(to: current)
         return .none
       case let .updateTime(time):
-          state.currentTime = time
-          if time >= state.totalDuration {
-            state.isPlaying = false
-          }
-          return .none
+        state.currentTime = time
+        if time >= state.totalDuration {
+          state.isPlaying = false
+        }
+        return .none
       default:
         return .none
       }

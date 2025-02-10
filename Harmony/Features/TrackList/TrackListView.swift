@@ -17,7 +17,9 @@ struct TrackListView: View {
     NavigationStack {
       VStack {
         if store.searchText.isEmpty && !isSearchFocused {
-          // TODO
+          VStack {
+            PopularArtistsView(store: store.scope(state: \.popularArtistsState, action: \.popularArtistsAction))
+          }
         } else {
           List {
             ForEach(store.trackList, id:\.id) { track in
@@ -28,6 +30,7 @@ struct TrackListView: View {
                 }
             }
           }
+          .listStyle(.plain)
           .scrollIndicators(.hidden)
         }
       }

@@ -14,17 +14,20 @@ struct TrackListFeature {
   struct State: Equatable {
     var searchText: String = ""
     var isLoading: Bool = false
+    var isSearchFocused: Bool = false 
     var error: String?
     var trackList: [TrackResponse] = []
+    var popularArtistsState = PopularArtistsFeature.State()
     @Presents var trackDetailState: TrackDetailFeature.State?
   }
 
   enum Action: BindableAction {
     case binding(BindingAction<State>)
     case listRowSelected(TrackResponse)
-    case showTrackDetail(PresentationAction<TrackDetailFeature.Action>)
     case searchTrackList
     case setTrackListResponse(TaskResult<SearchResponse>)
+    case showTrackDetail(PresentationAction<TrackDetailFeature.Action>)
+    case popularArtistsAction(PopularArtistsFeature.Action)
   }
 
   @Dependency(\.musicService) var musicService
@@ -70,13 +73,31 @@ struct TrackListFeature {
         state.isLoading = false
         state.error = error.localizedDescription
         return .none
+      case .popularArtistsAction(.artistSelected(let artistName)):
+        state.searchText = artistName
+        state.error = nil
+        state.isLoading = true
+        return .run { [text = state.searchText ]send in
+          await send(
+            .setTrackListResponse(
+              TaskResult {
+                try await searchTrackList(text)
+              }))
+        }
       default:
         return .none
       }
     }
-    .ifLet(\.$trackDetailState, action: \.showTrackDetail) {
-      TrackDetailFeature()
-    }
+    
+
+    .ifLet(\.$trackDetailState, action: \.showTrackDetail) { TrackDetailFeature() }
+
+    Scope(state: \.popularArtistsState, action: \.popularArtistsAction) { PopularArtistsFeature() }
+
+// TODO: Deprecated but not causing error
+//    Scope(state: \.popularArtistsState, action: /Action.popularArtistsAction) {
+//          PopularArtistsFeature()
+//      }
   }
 
   private func searchTrackList(_ searchText: String) async throws -> SearchResponse {
