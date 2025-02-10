@@ -20,6 +20,7 @@ struct TrackDetailFeature {
     var currentTime: Double = 0
     var totalDuration: Double = 0
     var volume: Double = 0.5
+    var playStatus: PlayStatus = .once
   }
 
   enum Action {
@@ -29,6 +30,7 @@ struct TrackDetailFeature {
     case updateVolume(Double)
     case updateTime(Double)
     case setInitialTime(Double, Double)
+    case setPlayStatus(PlayStatus)
     case dismissButtonTapped
   }
 
@@ -47,9 +49,9 @@ struct TrackDetailFeature {
             print(error)
           }
         }
-      case .playPauseTapped(let isPlaying):
-        state.isPlaying = isPlaying
-        if isPlaying {
+      case .playPauseTapped(let shouldPlay):
+        state.isPlaying = shouldPlay
+        if shouldPlay {
           musicPlayer.play()
         } else {
           musicPlayer.pause()
@@ -63,7 +65,7 @@ struct TrackDetailFeature {
         state.currentTime = current
         state.totalDuration = duration
         state.isLoading = false
-        return .none
+        return .send(.playPauseTapped(true))
       case .seek(let current):
         state.currentTime = current
         musicPlayer.seek(to: current)
@@ -71,11 +73,29 @@ struct TrackDetailFeature {
       case let .updateTime(time):
         state.currentTime = time
         if time >= state.totalDuration {
-          state.isPlaying = false
-          return .send(.seek(0))
+          if state.playStatus == .once {
+            state.isPlaying = false
+            return .send(.seek(0))
+          } else if state.playStatus == .again {
+            state.playStatus = .once
+            return .run { send in
+                await send(.seek(0))
+                await send(.playPauseTapped(true) )
+            }
+          } else {
+            return .run { send in
+                await send(.seek(0))
+                await send(.playPauseTapped(true) ) 
+            }
+          }
         }
         return .none
-      default:
+      case .setPlayStatus(var status):
+        status.next()
+        state.playStatus = status
+        return .none
+      case .dismissButtonTapped:
+        musicPlayer.pause()
         return .none
       }
     }

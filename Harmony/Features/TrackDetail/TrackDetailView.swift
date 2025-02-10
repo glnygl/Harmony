@@ -123,7 +123,7 @@ struct TrackDetailView: View {
 
       HStack(spacing: 40) {
         Button(action: {
-          // TODO:
+          //
         }) {
           Image(systemName: "info.circle")
             .font(.system(size: 20))
@@ -138,10 +138,13 @@ struct TrackDetailView: View {
         }
 
         Button(action: {
-          // TODO
+          store.send(.setPlayStatus(store.playStatus))
         }) {
-          Image(systemName: "arrow.trianglehead.counterclockwise")
+          Image(systemName: store.playStatus == .forever ? "arrow.trianglehead.2.clockwise" : "arrow.trianglehead.counterclockwise")
+            .id(store.playStatus)
+            .contentTransition(.symbolEffect(.replace))
             .font(.system(size: 20))
+            .foregroundStyle( store.playStatus == .once ? .gray : .green)
         }
       }
       .foregroundStyle(.gray)
