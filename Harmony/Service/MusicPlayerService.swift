@@ -16,49 +16,68 @@ protocol MusicPlayerProtocol {
   func seek(to time: Double)
   func currentTime() -> Double
   func duration() -> Double
-  func setURL(_ urlString: String) throws
+  func setURL(_ urlString: String) async throws -> Double
 }
 
 final class MusicPlayerService: MusicPlayerProtocol {
-  private var audioPlayer: AVAudioPlayer
+  private var player: AVPlayer
+  private var playerItem: AVPlayerItem?
 
-  init(audioPlayer: AVAudioPlayer = AVAudioPlayer()) {
-    self.audioPlayer = audioPlayer
+  init(player: AVPlayer = AVPlayer()) {
+    self.player = player
   }
 
-  func setURL(_ urlString: String) throws {
-    guard let url = URL(string: urlString) else { throw "Music url not found"}
-    do {
-      let data = try Data(contentsOf: url)
-      audioPlayer = try AVAudioPlayer(data: data)
-      audioPlayer.prepareToPlay()
-    } catch {
-      throw error
+  func setURL(_ urlString: String) async throws -> Double {
+    guard let url = URL(string: urlString) else {
+      throw NSError(domain: "MusicPlayerError", code: 0, userInfo: [NSLocalizedDescriptionKey: "Music URL not found"])
+    }
+
+    let playerItem = AVPlayerItem(url: url)
+    self.playerItem = playerItem
+    player.replaceCurrentItem(with: playerItem)
+
+    return try await withCheckedThrowingContinuation { continuation in
+      var observer: NSKeyValueObservation?
+      observer = playerItem.observe(\.status, options: [.new]) { item, _ in
+        if item.status == .readyToPlay {
+          let duration = item.duration.seconds
+          if duration.isFinite {
+            continuation.resume(returning: duration)
+          } else {
+            continuation.resume(throwing: NSError(domain: "MusicPlayerError", code: 2, userInfo: [NSLocalizedDescriptionKey: "Duration is not available"]))
+          }
+          observer?.invalidate()
+        } else if item.status == .failed {
+          continuation.resume(throwing: NSError(domain: "MusicPlayerError", code: 3, userInfo: [NSLocalizedDescriptionKey: item.error?.localizedDescription ?? "Unknown error"]))
+          observer?.invalidate()
+        }
+      }
     }
   }
 
   func play() {
-    audioPlayer.play()
+    player.play()
   }
 
   func pause() {
-    audioPlayer.pause()
+    player.pause()
   }
 
   func setVolume(_ volume: Double) {
-    audioPlayer.volume = Float(volume)
+    player.volume = Float(volume)
   }
 
   func seek(to time: Double) {
-    audioPlayer.currentTime = time
+    let cmTime = CMTime(seconds: time, preferredTimescale: 600)
+    player.seek(to: cmTime)
   }
 
   func currentTime() -> Double {
-    return audioPlayer.currentTime
+    return player.currentItem?.currentTime().seconds ?? 0
   }
 
   func duration() -> Double {
-    return audioPlayer.duration
+    return player.currentItem?.duration.seconds ?? 0
   }
-
 }
+

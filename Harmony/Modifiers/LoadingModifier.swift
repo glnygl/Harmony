@@ -13,7 +13,7 @@ struct LoadingModifier: ViewModifier {
   func body(content: Content) -> some View {
     content
       .disabled(isLoading)
-      .blur(radius: isLoading ? 1.2 : 0)
+      .blur(radius: isLoading ? 2 : 0)
       .overlay {
         if isLoading {
           LoadingView()

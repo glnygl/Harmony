@@ -43,8 +43,8 @@ struct TrackDetailFeature {
         state.musicURL = url
         return .run { send in
           do {
-            try musicPlayer.setURL(url)
-            await send(.setInitialTime(musicPlayer.currentTime(), musicPlayer.duration()))
+            let duration = try await musicPlayer.setURL(url)
+            await send(.setInitialTime(musicPlayer.currentTime(), duration))
           } catch {
             print(error)
           }
