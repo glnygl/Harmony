@@ -34,10 +34,13 @@ struct TrackListView: View {
           .scrollIndicators(.hidden)
         }
       }
-      .searchable(text: $store.searchText, prompt: "Search for tracks")
+      .searchable(text: $store.searchText, prompt: "Search")
       .searchFocused($isSearchFocused)
       .navigationTitle("Songs")
       .navigationBarTitleDisplayMode(.inline)
+    }
+    .onChange(of: store.isSearchFocused) {
+      isSearchFocused = store.isSearchFocused
     }
     .alert("Error", isPresented: Binding(
       get: { !store.error.isEmpty },

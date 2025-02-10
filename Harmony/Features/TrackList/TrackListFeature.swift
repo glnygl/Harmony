@@ -14,6 +14,7 @@ struct TrackListFeature {
   struct State: Equatable {
     var searchText: String = ""
     var isLoading: Bool = false
+    var isSearchFocused = false
     var error: String = ""
     var trackList: [TrackResponse] = []
     var popularArtistsState = PopularArtistsFeature.State()
@@ -24,6 +25,7 @@ struct TrackListFeature {
     case binding(BindingAction<State>)
     case listRowSelected(TrackResponse)
     case searchTrackList
+    case cancelSearch
     case setTrackListResponse(TaskResult<SearchResponse>)
     case showTrackDetail(PresentationAction<TrackDetailFeature.Action>)
     case popularArtistsAction(PopularArtistsFeature.Action)
@@ -45,8 +47,7 @@ struct TrackListFeature {
         .cancellable(id: CancelID.debounce)
       case .searchTrackList:
         guard !state.searchText.isEmpty else {
-          state.trackList = []
-          return .none
+          return .send(.cancelSearch)
         }
         state.error = ""
         state.isLoading = true
@@ -66,14 +67,20 @@ struct TrackListFeature {
       case .setTrackListResponse(.success(let response)):
         state.error = ""
         state.isLoading = false
+        state.isSearchFocused = false
         state.trackList = response.results
         return .none
       case .setTrackListResponse(.failure(let error)):
         state.isLoading = false
+        state.isSearchFocused = false
         state.error = error.localizedDescription
         return .none
+      case .cancelSearch:
+         state.trackList = []
+         return .none
       case .popularArtistsAction(.artistSelected(let artistName)):
         state.searchText = artistName
+        state.isSearchFocused = true
         state.error = ""
         state.isLoading = true
         return .run { [text = state.searchText ]send in
@@ -87,7 +94,6 @@ struct TrackListFeature {
         return .none
       }
     }
-    
 
     .ifLet(\.$trackDetailState, action: \.showTrackDetail) { TrackDetailFeature() }
 

@@ -21,10 +21,10 @@ struct PopularArtistsView: View {
   var body: some View {
     VStack(alignment: .leading, spacing: 10) {
       Text("Popular Artists")
-        .font(.title3)
+        .font(.system(size: 18))
         .fontWeight(.bold)
         .padding(.horizontal)
-        .foregroundStyle(.gray)
+        .foregroundStyle(.black).opacity(0.6)
         .underline()
 
       ScrollView(.horizontal, showsIndicators: false) {
@@ -36,7 +36,7 @@ struct PopularArtistsView: View {
               }
           }
         }
-        .frame(height: 120)
+        .frame(height: 100)
         .padding(.horizontal, 8)
       }
       Spacer()
@@ -51,7 +51,7 @@ struct PopularArtistsRowView: View {
     ZStack {
       Image(imageName)
         .resizable()
-        .frame(width: 120, height: 120)
+        .frame(width: 100, height: 100)
     }
   }
 }

@@ -70,7 +70,7 @@ struct TrackDetailView: View {
           .lineLimit(1)
 
         Text(store.track.artistName ?? "")
-          .font(.headline)
+          .font(.title3)
           .foregroundColor(.gray)
           .lineLimit(1)
       }
@@ -122,6 +122,7 @@ struct TrackDetailView: View {
 
       Spacer()
     }
+    .showLoadingView(isLoading: store.isLoading)
     .padding()
     .background(Color.white.ignoresSafeArea())
     .onAppear {

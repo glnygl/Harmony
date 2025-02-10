@@ -15,6 +15,7 @@ struct TrackDetailFeature {
     var track: TrackResponse
     var musicURL: String?
     var isPlaying: Bool = false
+    var isLoading: Bool = true
     var currentTime: Double = 0
     var totalDuration: Double = 0
     var volume: Double = 0.5
@@ -61,6 +62,7 @@ struct TrackDetailFeature {
       case .setInitialTime(let current, let duration):
         state.currentTime = current
         state.totalDuration = duration
+        state.isLoading = false
         return .none
       case .seek(let current):
         state.currentTime = current
@@ -70,6 +72,7 @@ struct TrackDetailFeature {
         state.currentTime = time
         if time >= state.totalDuration {
           state.isPlaying = false
+          return .send(.seek(0))
         }
         return .none
       default:
