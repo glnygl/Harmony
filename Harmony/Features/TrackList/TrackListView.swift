@@ -17,7 +17,8 @@ struct TrackListView: View {
     NavigationStack {
       VStack {
         if store.searchText.isEmpty && !isSearchFocused {
-          VStack {
+          VStack(spacing: 20) {
+            PopularGenreView(store: store.scope(state: \.popularGenresState, action: \.popularGenresAction))
             PopularArtistsView(store: store.scope(state: \.popularArtistsState, action: \.popularArtistsAction))
           }
         } else {
@@ -39,14 +40,13 @@ struct TrackListView: View {
       .navigationTitle("Songs")
       .navigationBarTitleDisplayMode(.inline)
     }
-    .onChange(of: store.isSearchFocused) {
-      isSearchFocused = store.isSearchFocused
-    }
     .alert("Error", isPresented: Binding(
       get: { !store.error.isEmpty },
       set: { _ in store.error = "" }
     )) {
-        Button("OK", role: .cancel) { }
+      Button("OK", role: .cancel) { }
+    } message: {
+      Text(store.error)
     }
     .fullScreenCover(
       item: $store.scope(state: \.trackDetailState, action: \.showTrackDetail)

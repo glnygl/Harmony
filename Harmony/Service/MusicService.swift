@@ -7,6 +7,7 @@
 
 protocol MusicServiceProtocol {
   func fetchSearchResponse(request: SearchRequest) async throws -> SearchResponse
+  func fetchGenreResponse(request: GenreRequest) async throws -> SearchResponse 
 }
 
 final class MusicService: MusicServiceProtocol {
@@ -18,6 +19,10 @@ final class MusicService: MusicServiceProtocol {
   }
 
   func fetchSearchResponse(request: SearchRequest) async throws -> SearchResponse {
+    return try await network.perform(request, responseType: SearchResponse.self)
+  }
+
+  func fetchGenreResponse(request: GenreRequest) async throws -> SearchResponse {
     return try await network.perform(request, responseType: SearchResponse.self)
   }
 }

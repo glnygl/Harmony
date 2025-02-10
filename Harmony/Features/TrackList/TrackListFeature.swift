@@ -13,11 +13,12 @@ struct TrackListFeature {
   @ObservableState
   struct State: Equatable {
     var searchText: String = ""
+    var selectedGenre: MusicGenre? = nil
     var isLoading: Bool = false
-    var isSearchFocused = false
     var error: String = ""
     var trackList: [TrackResponse] = []
     var popularArtistsState = PopularArtistsFeature.State()
+    var popularGenresState = PopularGenreFeature.State()
     @Presents var trackDetailState: TrackDetailFeature.State?
   }
 
@@ -27,8 +28,10 @@ struct TrackListFeature {
     case searchTrackList
     case cancelSearch
     case setTrackListResponse(TaskResult<SearchResponse>)
+    case setGenreTrackListResponse(TaskResult<SearchResponse>)
     case showTrackDetail(PresentationAction<TrackDetailFeature.Action>)
     case popularArtistsAction(PopularArtistsFeature.Action)
+    case popularGenresAction(PopularGenreFeature.Action)
   }
 
   @Dependency(\.musicService) var musicService
@@ -67,12 +70,20 @@ struct TrackListFeature {
       case .setTrackListResponse(.success(let response)):
         state.error = ""
         state.isLoading = false
-        state.isSearchFocused = false
         state.trackList = response.results
         return .none
       case .setTrackListResponse(.failure(let error)):
         state.isLoading = false
-        state.isSearchFocused = false
+        state.error = error.localizedDescription
+        return .none
+      case .setGenreTrackListResponse(.success(let response)):
+        state.error = ""
+        state.isLoading = false
+        state.searchText = state.selectedGenre?.title ?? ""
+        state.trackList = response.results
+        return .none
+      case .setGenreTrackListResponse(.failure(let error)):
+        state.isLoading = false
         state.error = error.localizedDescription
         return .none
       case .cancelSearch:
@@ -80,7 +91,6 @@ struct TrackListFeature {
          return .none
       case .popularArtistsAction(.artistSelected(let artistName)):
         state.searchText = artistName
-        state.isSearchFocused = true
         state.error = ""
         state.isLoading = true
         return .run { [text = state.searchText ]send in
@@ -90,6 +100,17 @@ struct TrackListFeature {
                 try await searchTrackList(text)
               }))
         }
+      case .popularGenresAction(.genreSelected(let genre)):
+        state.error = ""
+        state.isLoading = true
+        state.selectedGenre = genre
+        return .run { send in
+          await send(
+            .setGenreTrackListResponse(
+              TaskResult {
+                try await getGenreTrackList(genre)
+              }))
+        }
       default:
         return .none
       }
@@ -97,16 +118,18 @@ struct TrackListFeature {
 
     .ifLet(\.$trackDetailState, action: \.showTrackDetail) { TrackDetailFeature() }
 
+    Scope(state: \.popularGenresState, action: \.popularGenresAction) { PopularGenreFeature() }
     Scope(state: \.popularArtistsState, action: \.popularArtistsAction) { PopularArtistsFeature() }
 
-// TODO: Deprecated but not causing error
-//    Scope(state: \.popularArtistsState, action: /Action.popularArtistsAction) {
-//          PopularArtistsFeature()
-//      }
   }
 
   private func searchTrackList(_ searchText: String) async throws -> SearchResponse {
     let request = SearchRequest(searchText: searchText)
     return try await musicService.fetchSearchResponse(request: request)
+  }
+
+  private func getGenreTrackList(_ genre: MusicGenre) async throws -> SearchResponse {
+    let request = GenreRequest(genre: genre.rawValue)
+    return try await musicService.fetchGenreResponse(request: request)
   }
 }
