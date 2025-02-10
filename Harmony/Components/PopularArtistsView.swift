@@ -19,14 +19,16 @@ struct PopularArtistsView: View {
   var store: StoreOf<PopularArtistsFeature>
 
   var body: some View {
-    VStack(alignment: .leading, spacing: 8) {
+    VStack(alignment: .leading, spacing: 10) {
       Text("Popular Artists")
-        .font(.title2)
+        .font(.title3)
         .fontWeight(.bold)
         .padding(.horizontal)
+        .foregroundStyle(.gray)
+        .underline()
 
       ScrollView(.horizontal, showsIndicators: false) {
-        LazyHStack(spacing: 5) {
+        LazyHStack(spacing: 4) {
           ForEach(store.artists, id: \.id) { artist in
             PopularArtistsRowView(imageName: artist.image)
               .onTapGesture {
@@ -46,7 +48,7 @@ struct PopularArtistsRowView: View {
   let imageName: String
 
   var body: some View {
-    ZStack(alignment: .topTrailing) {
+    ZStack {
       Image(imageName)
         .resizable()
         .frame(width: 120, height: 120)

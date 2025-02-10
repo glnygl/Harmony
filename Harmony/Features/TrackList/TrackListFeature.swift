@@ -14,8 +14,7 @@ struct TrackListFeature {
   struct State: Equatable {
     var searchText: String = ""
     var isLoading: Bool = false
-    var isSearchFocused: Bool = false 
-    var error: String?
+    var error: String = ""
     var trackList: [TrackResponse] = []
     var popularArtistsState = PopularArtistsFeature.State()
     @Presents var trackDetailState: TrackDetailFeature.State?
@@ -49,7 +48,7 @@ struct TrackListFeature {
           state.trackList = []
           return .none
         }
-        state.error = nil
+        state.error = ""
         state.isLoading = true
         return .run { [text = state.searchText ]send in
           await send(
@@ -65,7 +64,7 @@ struct TrackListFeature {
         state.trackDetailState = nil
         return .none
       case .setTrackListResponse(.success(let response)):
-        state.error = nil
+        state.error = ""
         state.isLoading = false
         state.trackList = response.results
         return .none
@@ -75,7 +74,7 @@ struct TrackListFeature {
         return .none
       case .popularArtistsAction(.artistSelected(let artistName)):
         state.searchText = artistName
-        state.error = nil
+        state.error = ""
         state.isLoading = true
         return .run { [text = state.searchText ]send in
           await send(

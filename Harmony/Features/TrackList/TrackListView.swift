@@ -39,6 +39,12 @@ struct TrackListView: View {
       .navigationTitle("Songs")
       .navigationBarTitleDisplayMode(.inline)
     }
+    .alert("Error", isPresented: Binding(
+      get: { !store.error.isEmpty },
+      set: { _ in store.error = "" }
+    )) {
+        Button("OK", role: .cancel) { }
+    }
     .fullScreenCover(
       item: $store.scope(state: \.trackDetailState, action: \.showTrackDetail)
     ) { detailStore in
