@@ -16,6 +16,7 @@ struct TrackDetailFeature {
     var musicURL: String?
     var isPlaying: Bool = false
     var isLoading: Bool = true
+    var isFavorite: Bool = false
     var currentTime: Double = 0
     var totalDuration: Double = 0
     var volume: Double = 0.5
@@ -28,7 +29,6 @@ struct TrackDetailFeature {
     case updateVolume(Double)
     case updateTime(Double)
     case setInitialTime(Double, Double)
-    case playerFinished
     case dismissButtonTapped
   }
 

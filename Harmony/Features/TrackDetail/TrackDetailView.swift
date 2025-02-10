@@ -40,27 +40,27 @@ struct TrackDetailView: View {
         .clipShape(RoundedRectangle(cornerRadius: 12))
 
         Slider(
-            value: Binding<Double>(
-              get: { self.store.state.currentTime },
-                set: { newValue in
-                  self.store.send(.seek(newValue))
-                }
-            ), in: 0...store.totalDuration
+          value: Binding<Double>(
+            get: { self.store.state.currentTime },
+            set: { newValue in
+              self.store.send(.seek(newValue))
+            }
+          ), in: 0...store.totalDuration
         )
-          .accentColor(.gray)
-          .padding(.horizontal, 10)
-          .overlay(alignment: .bottomLeading) {
-            Text(store.currentTime.formatTime())
-              .font(.caption)
-              .foregroundColor(.gray)
-              .offset(x: 10, y: 12)
-          }
-          .overlay(alignment: .bottomTrailing) {
-            Text((store.totalDuration - store.currentTime).formatTime())
-              .font(.caption)
-              .foregroundColor(.gray)
-              .offset(x: -10, y: 12)
-          }
+        .accentColor(.gray)
+        .padding(.horizontal, 10)
+        .overlay(alignment: .bottomLeading) {
+          Text(store.currentTime.formatTime())
+            .font(.caption)
+            .foregroundColor(.gray)
+            .offset(x: 10, y: 12)
+        }
+        .overlay(alignment: .bottomTrailing) {
+          Text((store.totalDuration - store.currentTime).formatTime())
+            .font(.caption)
+            .foregroundColor(.gray)
+            .offset(x: -10, y: 12)
+        }
       }
 
       VStack(spacing: 8) {
@@ -104,23 +104,50 @@ struct TrackDetailView: View {
       }
       .padding(.vertical, 20)
 
+
       HStack {
         Image(systemName: "speaker.fill")
         Slider(
-            value: Binding<Double>(
-                get: { self.store.state.volume },
-                set: { newValue in
-                    self.store.send(.updateVolume(newValue))
-                }
-            ), in: 0...1
+          value: Binding<Double>(
+            get: { self.store.state.volume },
+            set: { newValue in
+              self.store.send(.updateVolume(newValue))
+            }
+          ), in: 0...1
         )
         Image(systemName: "speaker.wave.3.fill")
       }
       .foregroundStyle(.gray)
       .padding(.horizontal, 30)
+      .padding(.top, 10)
+
+      HStack(spacing: 40) {
+        Button(action: {
+          // TODO:
+        }) {
+          Image(systemName: "info.circle")
+            .font(.system(size: 20))
+        }
+
+        Button(action: {
+          // TODO: Add to favorite
+        }) {
+          Image(systemName: store.isFavorite ? "heart.fill" : "heart")
+            .font(.system(size: 32))
+            .foregroundColor(store.isFavorite ? .red : .gray)
+        }
+
+        Button(action: {
+          // TODO
+        }) {
+          Image(systemName: "arrow.trianglehead.counterclockwise")
+            .font(.system(size: 20))
+        }
+      }
+      .foregroundStyle(.gray)
+      .padding(.vertical, 20)
       .padding(.top, 20)
 
-      Spacer()
     }
     .showLoadingView(isLoading: store.isLoading)
     .padding()
