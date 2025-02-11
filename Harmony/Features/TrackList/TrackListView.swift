@@ -57,7 +57,6 @@ struct TrackListView: View {
                 Divider()
               }
               .listRowInsets(EdgeInsets(top: 4, leading: 16, bottom: 4, trailing: 16))
-//              .background(.red)
               .listRowSeparator(.hidden)
             }
           }

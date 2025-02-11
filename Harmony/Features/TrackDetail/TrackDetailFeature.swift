@@ -15,18 +15,17 @@ struct TrackDetailFeature {
   struct State: Equatable {
     var track: TrackResponse
     var musicURL: String?
-    var isPlaying: Bool = false
     var isLoading: Bool = true
     var isFavorite: Bool = false
     var currentTime: Double = 0
     var totalDuration: Double = 0
     var volume: Double = 0.5
     var playStatus: PlayStatus = .once
+    var playerControlState = PlayerControlFeature.State()
   }
 
   enum Action {
     case setMusicURL(String)
-    case playPauseTapped(Bool)
     case seek(Double)
     case updateVolume(Double)
     case updateTime(Double)
@@ -34,9 +33,8 @@ struct TrackDetailFeature {
     case setPlayStatus(PlayStatus)
     case infoButtonTapped
     case openURLResponse(TaskResult<Bool>)
-    case rewind
-    case forward
     case dismissButtonTapped
+    case playerControlAction(PlayerControlFeature.Action)
   }
 
   @Dependency(\.musicPlayer) var musicPlayer
@@ -55,8 +53,7 @@ struct TrackDetailFeature {
             print(error)
           }
         }
-      case .playPauseTapped(let shouldPlay):
-        state.isPlaying = shouldPlay
+      case .playerControlAction(.playPauseTapped(let shouldPlay)):
         if shouldPlay {
           musicPlayer.play()
         } else {
@@ -71,7 +68,7 @@ struct TrackDetailFeature {
         state.currentTime = current
         state.totalDuration = duration
         state.isLoading = false
-        return .send(.playPauseTapped(true))
+        return .send(.playerControlAction(.playPauseTapped(true)))
       case .seek(let current):
         state.currentTime = current
         musicPlayer.seek(to: current)
@@ -80,21 +77,20 @@ struct TrackDetailFeature {
         state.currentTime = time
         if time >= state.totalDuration {
           if state.playStatus == .once {
-            state.isPlaying = false
             return .run { send in
               await send(.seek(0))
-              await send(.playPauseTapped(false) )
+              await send(.playerControlAction(.playPauseTapped(false)))
             }
           } else if state.playStatus == .again {
             state.playStatus = .once
             return .run { send in
               await send(.seek(0))
-              await send(.playPauseTapped(true) )
+              await send(.playerControlAction(.playPauseTapped(true)))
             }
           } else {
             return .run { send in
               await send(.seek(0))
-              await send(.playPauseTapped(true) )
+              await send(.playerControlAction(.playPauseTapped(true)))
             }
           }
         }
@@ -120,7 +116,7 @@ struct TrackDetailFeature {
       case .dismissButtonTapped:
         musicPlayer.pause()
         return .none
-      case .rewind:
+      case .playerControlAction(.rewindTapped):
         if state.currentTime < 10 {
           state.currentTime = 0
           musicPlayer.seek(to: state.currentTime)
@@ -129,7 +125,7 @@ struct TrackDetailFeature {
           musicPlayer.seek(to: state.currentTime)
         }
         return .none
-      case .forward:
+      case .playerControlAction(.forwardTapped):
         if state.currentTime + 10 <= state.totalDuration {
           state.currentTime += 10
           musicPlayer.seek(to: state.currentTime)
@@ -137,5 +133,7 @@ struct TrackDetailFeature {
         return .none
       }
     }
+
+    Scope(state: \.playerControlState, action: \.playerControlAction) { PlayerControlFeature() }
   }
 }
