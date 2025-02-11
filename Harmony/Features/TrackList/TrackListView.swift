@@ -30,28 +30,38 @@ struct TrackListView: View {
                     .foregroundStyle(.black).opacity(0.6)
 
                       ForEach(store.grammyTrackList, id: \.id) { track in
+                        VStack(alignment: .leading) {
                           TrackListRowView(track: track)
-                              .onTapGesture {
-                                  store.send(.listRowSelected(track))
-                              }
-                              .padding(.horizontal)
+                            .onTapGesture {
+                              store.send(.listRowSelected(track))
+                            }
+                            .padding(.horizontal)
+                          Divider().padding(.horizontal)
+                        }
                       }
                   }
                 .padding(.top, -16)
               }
-              .padding(.vertical)
+              .padding(.top, 4)
+              .padding(.bottom, 10)
           }
           .scrollIndicators(.hidden)
         } else {
           List {
             ForEach(store.trackList, id:\.id) { track in
-              TrackListRowView(track: track)
-                .alignmentGuide(.listRowSeparatorLeading) { _ in 0 }
-                .onTapGesture {
-                  store.send(.listRowSelected(track))
-                }
+              VStack(alignment: .leading) {
+                TrackListRowView(track: track)
+                  .onTapGesture {
+                    store.send(.listRowSelected(track))
+                  }
+                Divider()
+              }
+              .listRowInsets(EdgeInsets(top: 4, leading: 16, bottom: 4, trailing: 16))
+//              .background(.red)
+              .listRowSeparator(.hidden)
             }
           }
+          .listRowSpacing(0)
           .listStyle(.plain)
           .scrollIndicators(.hidden)
         }

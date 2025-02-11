@@ -77,28 +77,47 @@ struct TrackDetailView: View {
       .padding(.top, 20)
 
 
-      HStack(spacing: 40) {
+      HStack(spacing: 28) {
+
         Button(action: {
-          // TODO
+          store.send(.rewind)
         }) {
-          Image(systemName: "backward.fill")
-            .font(.title)
+          Image(systemName: "10.arrow.trianglehead.counterclockwise")
+            .font(.title3)
             .foregroundColor(.black)
         }
 
-        Button(action: {
-          store.send(.playPauseTapped(!store.isPlaying))
-        }) {
-          Image(systemName: store.isPlaying ? "pause.fill" : "play.fill")
-            .font(.system(size: 50))
-            .foregroundColor(.black)
+        HStack(spacing: 40) {
+          Button(action: {
+            // TODO: Previous song
+          }) {
+            Image(systemName: "backward.fill")
+              .font(.title)
+              .foregroundColor(.black)
+          }
+
+          Button(action: {
+            store.send(.playPauseTapped(!store.isPlaying))
+          }) {
+            Image(systemName: store.isPlaying ? "pause.fill" : "play.fill")
+              .font(.system(size: 50))
+              .foregroundColor(.black)
+          }
+
+          Button(action: {
+            // TODO: Next song
+          }) {
+            Image(systemName: "forward.fill")
+              .font(.title)
+              .foregroundColor(.black)
+          }
         }
 
         Button(action: {
-          // TODO
+          store.send(.forward)
         }) {
-          Image(systemName: "forward.fill")
-            .font(.title)
+          Image(systemName: "10.arrow.trianglehead.clockwise")
+            .font(.title3)
             .foregroundColor(.black)
         }
       }

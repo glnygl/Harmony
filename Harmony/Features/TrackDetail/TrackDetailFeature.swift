@@ -34,6 +34,8 @@ struct TrackDetailFeature {
     case setPlayStatus(PlayStatus)
     case infoButtonTapped
     case openURLResponse(TaskResult<Bool>)
+    case rewind
+    case forward
     case dismissButtonTapped
   }
 
@@ -80,19 +82,19 @@ struct TrackDetailFeature {
           if state.playStatus == .once {
             state.isPlaying = false
             return .run { send in
-                await send(.seek(0))
-                await send(.playPauseTapped(false) )
+              await send(.seek(0))
+              await send(.playPauseTapped(false) )
             }
           } else if state.playStatus == .again {
             state.playStatus = .once
             return .run { send in
-                await send(.seek(0))
-                await send(.playPauseTapped(true) )
+              await send(.seek(0))
+              await send(.playPauseTapped(true) )
             }
           } else {
             return .run { send in
-                await send(.seek(0))
-                await send(.playPauseTapped(true) ) 
+              await send(.seek(0))
+              await send(.playPauseTapped(true) )
             }
           }
         }
@@ -104,11 +106,11 @@ struct TrackDetailFeature {
       case .infoButtonTapped:
         guard let url = URL(string: state.track.infoURL ?? "") else { return .none }
         return .run { send in
-            await send(.openURLResponse(
-                TaskResult {
-                    await openURL(url)
-                }
-            ))
+          await send(.openURLResponse(
+            TaskResult {
+              await openURL(url)
+            }
+          ))
         }
       case .openURLResponse(.success(_)):
         musicPlayer.pause()
@@ -117,6 +119,21 @@ struct TrackDetailFeature {
         return .none
       case .dismissButtonTapped:
         musicPlayer.pause()
+        return .none
+      case .rewind:
+        if state.currentTime < 10 {
+          state.currentTime = 0
+          musicPlayer.seek(to: state.currentTime)
+        } else {
+          state.currentTime -= 10
+          musicPlayer.seek(to: state.currentTime)
+        }
+        return .none
+      case .forward:
+        if state.currentTime + 10 <= state.totalDuration {
+          state.currentTime += 10
+          musicPlayer.seek(to: state.currentTime)
+        }
         return .none
       }
     }
