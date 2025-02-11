@@ -17,7 +17,7 @@ enum GrammyWinner {
     TrackResponse(id: 1731060236,
                   img: "https://is1-ssl.mzstatic.com/image/thumb/Music112/v4/55/0e/5e/550e5ecc-3fe4-50df-c5a3-a019b67008c3/196871854894.jpg/100x100bb.jpg",
                   url: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/a4/2a/07/a42a0774-03b7-2f78-ca3d-0b863310f05e/mzaf_17579986840463465436.plus.aac.p.m4a",
-                  trackName: "Shakira: Bzrp Music Sessions, Vol. 53",
+                  trackName: "Shakira: Bzrp Music Sessions",
                   artistName: "Bizarrap & Shakira",
                   collectionName: "Las Mujeres Ya No Lloran",
                   infoURL: "https://music.apple.com/us/album/bzrp-music-sessions-vol-53-ti%C3%ABsto-remix/1731059947?i=1731060249&uo=4"),

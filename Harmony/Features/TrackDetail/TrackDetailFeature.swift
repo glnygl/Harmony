@@ -16,12 +16,12 @@ struct TrackDetailFeature {
     var track: TrackResponse
     var musicURL: String?
     var isLoading: Bool = true
-    var isFavorite: Bool = false
     var currentTime: Double = 0
     var totalDuration: Double = 0
     var volume: Double = 0.5
-    var playStatus: PlayStatus = .once
+//    var playStatus: PlayStatus = .once
     var playerControlState = PlayerControlFeature.State()
+    var trackControlState = TrackControlFeature.State()
   }
 
   enum Action {
@@ -30,11 +30,10 @@ struct TrackDetailFeature {
     case updateVolume(Double)
     case updateTime(Double)
     case setInitialTime(Double, Double)
-    case setPlayStatus(PlayStatus)
-    case infoButtonTapped
     case openURLResponse(TaskResult<Bool>)
     case dismissButtonTapped
     case playerControlAction(PlayerControlFeature.Action)
+    case trackControlAction(TrackControlFeature.Action)
   }
 
   @Dependency(\.musicPlayer) var musicPlayer
@@ -76,13 +75,13 @@ struct TrackDetailFeature {
       case let .updateTime(time):
         state.currentTime = time
         if time >= state.totalDuration {
-          if state.playStatus == .once {
+          if state.trackControlState.playStatus == .once {
             return .run { send in
               await send(.seek(0))
               await send(.playerControlAction(.playPauseTapped(false)))
             }
-          } else if state.playStatus == .again {
-            state.playStatus = .once
+          } else if state.trackControlState.playStatus == .again {
+            state.trackControlState.playStatus = .once
             return .run { send in
               await send(.seek(0))
               await send(.playerControlAction(.playPauseTapped(true)))
@@ -95,11 +94,9 @@ struct TrackDetailFeature {
           }
         }
         return .none
-      case .setPlayStatus(var status):
-        status.next()
-        state.playStatus = status
+      case .trackControlAction(.setPlayStatus(_)):
         return .none
-      case .infoButtonTapped:
+      case .trackControlAction(.infoButtonTapped):
         guard let url = URL(string: state.track.infoURL ?? "") else { return .none }
         return .run { send in
           await send(.openURLResponse(
@@ -108,6 +105,8 @@ struct TrackDetailFeature {
             }
           ))
         }
+      case .trackControlAction(.muteVolume(_)):
+        return .none
       case .openURLResponse(.success(_)):
         musicPlayer.pause()
         return .none
@@ -135,5 +134,6 @@ struct TrackDetailFeature {
     }
 
     Scope(state: \.playerControlState, action: \.playerControlAction) { PlayerControlFeature() }
+    Scope(state: \.trackControlState, action: \.trackControlAction) { TrackControlFeature() }
   }
 }

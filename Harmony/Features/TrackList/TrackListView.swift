@@ -35,9 +35,9 @@ struct TrackListView: View {
                             .onTapGesture {
                               store.send(.listRowSelected(track))
                             }
-                            .padding(.horizontal)
-                          Divider().padding(.horizontal)
+                          Divider()
                         }
+                        .padding(.horizontal, 20)
                       }
                   }
                 .padding(.top, -16)
@@ -67,7 +67,7 @@ struct TrackListView: View {
       }
       .searchable(text: $store.searchText, prompt: "What do you want to listen to?")
       .searchFocused($isSearchFocused)
-      .navigationTitle("Songs")
+      .navigationTitle("Discover")
       .navigationBarTitleDisplayMode(.inline)
     }
     .alert("Error", isPresented: Binding(

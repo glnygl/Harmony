@@ -96,33 +96,7 @@ struct TrackDetailView: View {
       .padding(.horizontal, 30)
       .padding(.top, 10)
 
-      HStack(spacing: 40) {
-        Button(action: {
-          store.send(.infoButtonTapped)
-        }) {
-          Image(systemName: "info.circle")
-            .font(.system(size: 20))
-        }
-
-        Button(action: {
-          // TODO: Add to favorite
-        }) {
-          Image(systemName: store.isFavorite ? "heart.fill" : "heart")
-            .font(.system(size: 32))
-            .foregroundColor(store.isFavorite ? .red : .gray)
-        }
-
-        Button(action: {
-          store.send(.setPlayStatus(store.playStatus))
-        }) {
-          Image(systemName: store.playStatus == .forever ? "arrow.trianglehead.2.clockwise" : "arrow.trianglehead.counterclockwise")
-            .id(store.playStatus)
-            .contentTransition(.symbolEffect(.replace))
-            .font(.system(size: 20))
-            .foregroundStyle( store.playStatus == .once ? .gray : .green)
-        }
-      }
-      .foregroundStyle(.gray)
+      TrackControlView(store: store.scope(state: \.trackControlState, action: \.trackControlAction))
       .padding(.vertical, 20)
       .padding(.top, 20)
 
