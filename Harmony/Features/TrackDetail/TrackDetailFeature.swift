@@ -18,22 +18,21 @@ struct TrackDetailFeature {
     var isLoading: Bool = true
     var currentTime: Double = 0
     var totalDuration: Double = 0
-    var volume: Double = 0.5
-//    var playStatus: PlayStatus = .once
     var playerControlState = PlayerControlFeature.State()
     var trackControlState = TrackControlFeature.State()
+    var volumeControlState = VolumeControlFeature.State()
   }
 
   enum Action {
     case setMusicURL(String)
     case seek(Double)
-    case updateVolume(Double)
     case updateTime(Double)
     case setInitialTime(Double, Double)
     case openURLResponse(TaskResult<Bool>)
     case dismissButtonTapped
     case playerControlAction(PlayerControlFeature.Action)
     case trackControlAction(TrackControlFeature.Action)
+    case volumeControlAction(VolumeControlFeature.Action)
   }
 
   @Dependency(\.musicPlayer) var musicPlayer
@@ -52,17 +51,6 @@ struct TrackDetailFeature {
             print(error)
           }
         }
-      case .playerControlAction(.playPauseTapped(let shouldPlay)):
-        if shouldPlay {
-          musicPlayer.play()
-        } else {
-          musicPlayer.pause()
-        }
-        return .none
-      case .updateVolume(let volume):
-        state.volume = volume
-        musicPlayer.setVolume(volume)
-        return .none
       case .setInitialTime(let current, let duration):
         state.currentTime = current
         state.totalDuration = duration
@@ -94,19 +82,6 @@ struct TrackDetailFeature {
           }
         }
         return .none
-      case .trackControlAction(.setPlayStatus(_)):
-        return .none
-      case .trackControlAction(.infoButtonTapped):
-        guard let url = URL(string: state.track.infoURL ?? "") else { return .none }
-        return .run { send in
-          await send(.openURLResponse(
-            TaskResult {
-              await openURL(url)
-            }
-          ))
-        }
-      case .trackControlAction(.muteVolume(_)):
-        return .none
       case .openURLResponse(.success(_)):
         musicPlayer.pause()
         return .none
@@ -114,6 +89,13 @@ struct TrackDetailFeature {
         return .none
       case .dismissButtonTapped:
         musicPlayer.pause()
+        return .none
+      case .playerControlAction(.playPauseTapped(let shouldPlay)):
+        if shouldPlay {
+          musicPlayer.play()
+        } else {
+          musicPlayer.pause()
+        }
         return .none
       case .playerControlAction(.rewindTapped):
         if state.currentTime < 10 {
@@ -130,10 +112,27 @@ struct TrackDetailFeature {
           musicPlayer.seek(to: state.currentTime)
         }
         return .none
+      case .trackControlAction(.setPlayStatus(_)):
+        return .none
+      case .trackControlAction(.infoButtonTapped):
+        guard let url = URL(string: state.track.infoURL ?? "") else { return .none }
+        return .run { send in
+          await send(.openURLResponse(
+            TaskResult {
+              await openURL(url)
+            }
+          ))
+        }
+      case .trackControlAction(.muteVolume(_)):
+        return .none
+      case .volumeControlAction(.updateVolume(let volume)):
+        musicPlayer.setVolume(volume)
+        return .none
       }
     }
 
     Scope(state: \.playerControlState, action: \.playerControlAction) { PlayerControlFeature() }
     Scope(state: \.trackControlState, action: \.trackControlAction) { TrackControlFeature() }
+    Scope(state: \.volumeControlState, action: \.volumeControlAction) { VolumeControlFeature() }
   }
 }
