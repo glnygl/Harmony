@@ -19,6 +19,6 @@ struct SearchRequest: Request {
 
 struct SearchRequestQuery: QueryParams, Encodable {
   let term: String
-  let limit = 10
+  let limit = 15
   let media = "music"
 }

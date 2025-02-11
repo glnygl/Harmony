@@ -47,5 +47,5 @@ struct TrackListRowView: View {
 }
 
 #Preview {
-  TrackListRowView(track: TrackResponse(id: 1, img: "", url: "", trackName: "rihanna", artistName: "rihanna", collectionName: ""))
+  TrackListRowView(track: TrackResponse(id: 1, img: "", url: "", trackName: "rihanna", artistName: "rihanna", collectionName: "", infoURL: ""))
 }

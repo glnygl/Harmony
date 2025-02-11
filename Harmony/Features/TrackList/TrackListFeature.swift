@@ -17,6 +17,7 @@ struct TrackListFeature {
     var isLoading: Bool = false
     var error: String = ""
     var trackList: [TrackResponse] = []
+    var grammyTrackList: [TrackResponse] = GrammyWinner.tracks
     var popularArtistsState = PopularArtistsFeature.State()
     var popularGenresState = PopularGenreFeature.State()
     @Presents var trackDetailState: TrackDetailFeature.State?

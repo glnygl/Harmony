@@ -25,7 +25,6 @@ struct PopularArtistsView: View {
         .fontWeight(.bold)
         .padding(.horizontal)
         .foregroundStyle(.black).opacity(0.6)
-        .underline()
 
       ScrollView(.horizontal, showsIndicators: false) {
         LazyHStack(spacing: 4) {

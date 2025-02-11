@@ -17,10 +17,31 @@ struct TrackListView: View {
     NavigationStack {
       VStack {
         if store.searchText.isEmpty && !isSearchFocused {
-          VStack(spacing: 20) {
-            PopularGenreView(store: store.scope(state: \.popularGenresState, action: \.popularGenresAction))
-            PopularArtistsView(store: store.scope(state: \.popularArtistsState, action: \.popularArtistsAction))
+          ScrollView {
+              VStack(alignment: .leading, spacing: 20) {
+                  PopularGenreView(store: store.scope(state: \.popularGenresState, action: \.popularGenresAction))
+                  PopularArtistsView(store: store.scope(state: \.popularArtistsState, action: \.popularArtistsAction))
+
+                VStack(alignment: .leading, spacing: 10) {
+                  Text("Grammy Winners")
+                    .font(.system(size: 18))
+                    .fontWeight(.bold)
+                    .padding(.horizontal)
+                    .foregroundStyle(.black).opacity(0.6)
+
+                      ForEach(store.grammyTrackList, id: \.id) { track in
+                          TrackListRowView(track: track)
+                              .onTapGesture {
+                                  store.send(.listRowSelected(track))
+                              }
+                              .padding(.horizontal)
+                      }
+                  }
+                .padding(.top, -16)
+              }
+              .padding(.vertical)
           }
+          .scrollIndicators(.hidden)
         } else {
           List {
             ForEach(store.trackList, id:\.id) { track in
@@ -35,7 +56,7 @@ struct TrackListView: View {
           .scrollIndicators(.hidden)
         }
       }
-      .searchable(text: $store.searchText, prompt: "Search")
+      .searchable(text: $store.searchText, prompt: "What do you want to listen to?")
       .searchFocused($isSearchFocused)
       .navigationTitle("Songs")
       .navigationBarTitleDisplayMode(.inline)

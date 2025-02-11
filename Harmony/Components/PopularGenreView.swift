@@ -19,7 +19,6 @@ struct PopularGenreView: View {
         .fontWeight(.bold)
         .padding(.horizontal)
         .foregroundStyle(.black).opacity(0.6)
-        .underline()
 
       ZStack {
         FlowLayout(spacing: 8) {

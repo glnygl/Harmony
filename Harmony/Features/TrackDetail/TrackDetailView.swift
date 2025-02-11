@@ -168,7 +168,7 @@ struct TrackDetailView: View {
 
 #Preview {
   TrackDetailView(
-    store: Store(initialState: TrackDetailFeature.State(track: TrackResponse(id: 1, img: "", url: "", trackName: "rihanna", artistName: "rihanna", collectionName: ""))) {
+    store: Store(initialState: TrackDetailFeature.State(track: TrackResponse(id: 1, img: "", url: "", trackName: "rihanna", artistName: "rihanna", collectionName: "", infoURL: ""))) {
       TrackDetailFeature()
     }
   )

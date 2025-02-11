@@ -75,7 +75,10 @@ struct TrackDetailFeature {
         if time >= state.totalDuration {
           if state.playStatus == .once {
             state.isPlaying = false
-            return .send(.seek(0))
+            return .run { send in
+                await send(.seek(0))
+                await send(.playPauseTapped(false) )
+            }
           } else if state.playStatus == .again {
             state.playStatus = .once
             return .run { send in
