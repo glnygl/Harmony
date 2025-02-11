@@ -123,7 +123,7 @@ struct TrackDetailView: View {
 
       HStack(spacing: 40) {
         Button(action: {
-          //
+          store.send(.infoButtonTapped)
         }) {
           Image(systemName: "info.circle")
             .font(.system(size: 20))

@@ -5,6 +5,7 @@
 //  Created by Glny Gl on 07/02/2025.
 //
 
+import Foundation
 import ComposableArchitecture
 
 @Reducer
@@ -31,10 +32,13 @@ struct TrackDetailFeature {
     case updateTime(Double)
     case setInitialTime(Double, Double)
     case setPlayStatus(PlayStatus)
+    case infoButtonTapped
+    case openURLResponse(TaskResult<Bool>)
     case dismissButtonTapped
   }
 
   @Dependency(\.musicPlayer) var musicPlayer
+  @Dependency(\.openURL) var openURL
 
   var body: some ReducerOf<Self> {
     Reduce { state, action in
@@ -96,6 +100,20 @@ struct TrackDetailFeature {
       case .setPlayStatus(var status):
         status.next()
         state.playStatus = status
+        return .none
+      case .infoButtonTapped:
+        guard let url = URL(string: state.track.infoURL ?? "") else { return .none }
+        return .run { send in
+            await send(.openURLResponse(
+                TaskResult {
+                    await openURL(url)
+                }
+            ))
+        }
+      case .openURLResponse(.success(_)):
+        musicPlayer.pause()
+        return .none
+      case .openURLResponse(.failure(_)):
         return .none
       case .dismissButtonTapped:
         musicPlayer.pause()
