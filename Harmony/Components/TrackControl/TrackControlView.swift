@@ -23,11 +23,19 @@ struct TrackControlView: View {
         }
 
         Button(action: {
-          // TODO: Add to favorite
+          store.send(.muteVolume(!store.isMute))
         }) {
-          Image(systemName: store.isMute ?  "speaker.slash" : "speaker.wave.2")
-            .font(.system(size: 24))
-            .foregroundColor(.gray)
+          ZStack {
+              Image(systemName: "speaker.wave.2")
+              .font(.system(size: 24))
+              if store.isMute {
+                  Rectangle()
+                      .frame(width: 30, height: 2)
+                      .rotationEffect(.degrees(54))
+                      .foregroundColor(.gray)
+              }
+          }
+          .foregroundColor(.gray)
         }
 
         Button(action: {

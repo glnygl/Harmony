@@ -13,6 +13,7 @@ struct VolumeControlFeature {
   @ObservableState
   struct State: Equatable {
     var volume: Double = 0.5
+    var previousVolume: Double = 0.5
   }
   
   enum Action {
@@ -22,8 +23,8 @@ struct VolumeControlFeature {
   var body: some ReducerOf<Self> {
     Reduce { state, action in
       switch action {
-      case .updateVolume(let volume):
-        state.volume = volume
+      case .updateVolume(let value):
+        state.volume = value
         return .none
       }
     }

@@ -30,7 +30,10 @@ struct TrackControlFeature {
         status.next()
         state.playStatus = status
         return .none
-      default:
+      case .muteVolume(let value):
+        state.isMute = value
+        return .none
+      case .infoButtonTapped:
         return .none
       }
       }

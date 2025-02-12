@@ -11,7 +11,7 @@ import ComposableArchitecture
 
 struct TrackDetailView: View {
   var store: StoreOf<TrackDetailFeature>
-  
+
   var body: some View {
     VStack {
       Button(action: {
@@ -23,9 +23,9 @@ struct TrackDetailView: View {
           .frame(width: 40, height: 20)
           .foregroundStyle(.gray)
       }
-      
+
       Spacer()
-      
+
       VStack(spacing: 10) {
         LazyImage(url:URL(string: store.track.img!.replacingOccurrences(of: "100x100", with: "600x600"))) { state in
           if let image = state.image {
@@ -38,7 +38,7 @@ struct TrackDetailView: View {
           }
         }
         .clipShape(RoundedRectangle(cornerRadius: 12))
-        
+
         Slider(
           value: Binding<Double>(
             get: { self.store.state.currentTime },
@@ -62,32 +62,41 @@ struct TrackDetailView: View {
             .offset(x: -10, y: 12)
         }
       }
-      
+      .overlay(alignment: .topTrailing, content: {
+        Button(action: {
+          store.send(.showPopover(true))
+        }) {
+          Image(systemName: "ellipsis")
+            .foregroundStyle(.gray)
+        }
+        .offset(x: -30, y: -20)
+      })
+
       VStack(spacing: 8) {
         Text(store.track.trackName ?? "")
           .font(.title2)
           .fontWeight(.semibold)
           .lineLimit(1)
-        
+
         Text(store.track.artistName ?? "")
           .font(.title3)
           .foregroundColor(.gray)
           .lineLimit(1)
       }
       .padding(.top, 20)
-      
+
       PlayerControlView(store: store.scope(state: \.playerControlState, action: \.playerControlAction))
         .padding(.vertical, 20)
-      
+
       VolumeControlView(store: store.scope(state: \.volumeControlState, action: \.volumeControlAction))
         .foregroundStyle(.gray)
         .padding(.horizontal, 30)
         .padding(.top, 10)
-      
+
       TrackControlView(store: store.scope(state: \.trackControlState, action: \.trackControlAction))
         .padding(.vertical, 20)
         .padding(.top, 20)
-      
+
     }
     .showLoadingView(isLoading: store.isLoading)
     .padding()
@@ -100,6 +109,14 @@ struct TrackDetailView: View {
         store.send(.updateTime(store.currentTime + 1))
       }
     }
+    .popover(isPresented: Binding<Bool>(
+      get: { self.store.state.showPopover },
+      set: { newValue in
+        self.store.send(.showPopover(newValue))
+      })) {
+        Text(store.track.collectionName ?? "")
+         // .presentationCompactAdaptation(.popover) 
+      }
   }
 }
 

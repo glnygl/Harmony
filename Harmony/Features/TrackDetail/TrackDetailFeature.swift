@@ -16,6 +16,7 @@ struct TrackDetailFeature {
     var track: TrackResponse
     var musicURL: String?
     var isLoading: Bool = true
+    var showPopover: Bool = false
     var currentTime: Double = 0
     var totalDuration: Double = 0
     var playerControlState = PlayerControlFeature.State()
@@ -30,6 +31,7 @@ struct TrackDetailFeature {
     case setInitialTime(Double, Double)
     case openURLResponse(TaskResult<Bool>)
     case dismissButtonTapped
+    case showPopover(Bool)
     case playerControlAction(PlayerControlFeature.Action)
     case trackControlAction(TrackControlFeature.Action)
     case volumeControlAction(VolumeControlFeature.Action)
@@ -90,6 +92,9 @@ struct TrackDetailFeature {
       case .dismissButtonTapped:
         musicPlayer.pause()
         return .none
+      case .showPopover(let value):
+        state.showPopover = value
+        return .none
       case .playerControlAction(.playPauseTapped(let shouldPlay)):
         if shouldPlay {
           musicPlayer.play()
@@ -123,10 +128,20 @@ struct TrackDetailFeature {
             }
           ))
         }
-      case .trackControlAction(.muteVolume(_)):
-        return .none
+      case .trackControlAction(.muteVolume(let value)):
+        state.trackControlState.isMute = value
+
+        if value {
+          state.volumeControlState.previousVolume = state.volumeControlState.volume
+          state.volumeControlState.volume = 0
+        } else {
+          state.volumeControlState.volume = state.volumeControlState.previousVolume
+        }
+
+        return .send(.volumeControlAction(.updateVolume(state.volumeControlState.volume)))
       case .volumeControlAction(.updateVolume(let volume)):
         musicPlayer.setVolume(volume)
+        state.trackControlState.isMute = (volume == 0)
         return .none
       }
     }
