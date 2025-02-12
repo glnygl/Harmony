@@ -11,6 +11,9 @@ import ComposableArchitecture
 @Reducer
 struct TrackDetailFeature {
 
+  @Dependency(\.musicPlayer) var musicPlayer
+  @Dependency(\.openURL) var openURL
+
   @ObservableState
   struct State: Equatable {
     var track: TrackResponse
@@ -24,25 +27,27 @@ struct TrackDetailFeature {
     var volumeControlState = VolumeControlFeature.State()
   }
 
-  enum Action {
+  enum Action: BindableAction {
+    case binding(BindingAction<State>)
     case setMusicURL(String)
     case seek(Double)
     case updateTime(Double)
     case setInitialTime(Double, Double)
     case openURLResponse(TaskResult<Bool>)
     case dismissButtonTapped
-    case showPopover(Bool)
     case playerControlAction(PlayerControlFeature.Action)
     case trackControlAction(TrackControlFeature.Action)
     case volumeControlAction(VolumeControlFeature.Action)
   }
 
-  @Dependency(\.musicPlayer) var musicPlayer
-  @Dependency(\.openURL) var openURL
-
   var body: some ReducerOf<Self> {
+    BindingReducer()
     Reduce { state, action in
       switch action {
+      case .binding(\.showPopover):
+        return .none
+      case .binding(_):
+        return .none
       case .setMusicURL(let url):
         state.musicURL = url
         return .run { send in
@@ -91,9 +96,6 @@ struct TrackDetailFeature {
         return .none
       case .dismissButtonTapped:
         musicPlayer.pause()
-        return .none
-      case .showPopover(let value):
-        state.showPopover = value
         return .none
       case .playerControlAction(.playPauseTapped(let shouldPlay)):
         if shouldPlay {

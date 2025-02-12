@@ -10,6 +10,10 @@ import ComposableArchitecture
 @Reducer
 struct TrackListFeature {
 
+  @Dependency(\.musicService) var musicService
+
+  private enum CancelID { case debounce }
+
   @ObservableState
   struct State: Equatable {
     var searchText: String = ""
@@ -34,10 +38,6 @@ struct TrackListFeature {
     case popularArtistsAction(PopularArtistsFeature.Action)
     case popularGenresAction(PopularGenreFeature.Action)
   }
-
-  @Dependency(\.musicService) var musicService
-
-  private enum CancelID { case debounce }
 
   var body: some ReducerOf<Self> {
     BindingReducer()

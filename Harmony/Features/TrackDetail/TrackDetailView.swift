@@ -10,7 +10,7 @@ import NukeUI
 import ComposableArchitecture
 
 struct TrackDetailView: View {
-  var store: StoreOf<TrackDetailFeature>
+  @Bindable var store: StoreOf<TrackDetailFeature>
 
   var body: some View {
     VStack {
@@ -64,7 +64,7 @@ struct TrackDetailView: View {
       }
       .overlay(alignment: .topTrailing, content: {
         Button(action: {
-          store.send(.showPopover(true))
+          store.send(.binding(.set(\.showPopover, true)))
         }) {
           Image(systemName: "ellipsis")
             .foregroundStyle(.gray)
@@ -109,13 +109,9 @@ struct TrackDetailView: View {
         store.send(.updateTime(store.currentTime + 1))
       }
     }
-    .popover(isPresented: Binding<Bool>(
-      get: { self.store.state.showPopover },
-      set: { newValue in
-        self.store.send(.showPopover(newValue))
-      })) {
+    .popover(isPresented: $store.showPopover) {
         Text(store.track.collectionName ?? "")
-         // .presentationCompactAdaptation(.popover) 
+         // .presentationCompactAdaptation(.popover)
       }
   }
 }
