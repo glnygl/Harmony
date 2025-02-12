@@ -28,7 +28,7 @@ struct PopularGenreView: View {
               .padding(.vertical, 6)
               .overlay(
                 RoundedRectangle(cornerRadius: 6)
-                  .stroke(.gray, lineWidth: 1)
+                  .stroke(.gray, lineWidth: 0.6)
               )
               .font(.system(size: 16))
               .foregroundColor(.gray)
