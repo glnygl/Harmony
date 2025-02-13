@@ -21,11 +21,15 @@ struct TrackControlFeature {
     case infoButtonTapped
     case muteVolume(Bool)
     case setPlayStatus(PlayStatus)
+    case favoriteButtonTapped(Bool)
   }
 
   var body: some ReducerOf<Self> {
     Reduce { state, action in
       switch action {
+      case .favoriteButtonTapped(let value):
+        state.isFavorite = value
+        return .none
       case .setPlayStatus(var status):
         status.next()
         state.playStatus = status

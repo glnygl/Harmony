@@ -39,7 +39,7 @@ struct TrackControlView: View {
         }
 
         Button(action: {
-          // TODO: Add to favorite
+          store.send(.favoriteButtonTapped(!store.isFavorite))
         }) {
           Image(systemName: store.isFavorite ? "heart.fill" : "heart")
             .font(.system(size: 24))

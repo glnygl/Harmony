@@ -1,5 +1,5 @@
 //
-//  TrackModel.swift
+//  FavoriteTrack.swift
 //  Harmony
 //
 //  Created by Glny Gl on 12/02/2025.
@@ -8,7 +8,8 @@
 import SwiftData
 
 @Model
-final class TrackModel {
+final class FavoriteTrack {
+
   @Attribute(.unique) var id: Int
   var img: String?
   var url: String?
@@ -25,5 +26,17 @@ final class TrackModel {
     self.artistName = artistName
     self.collectionName = collectionName
     self.infoURL = infoURL
+  }
+
+  func toTrackResponse() -> TrackResponse {
+    return TrackResponse(
+      id: self.id,
+      img: self.img,
+      url: self.url,
+      trackName: self.trackName,
+      artistName: self.artistName,
+      collectionName: self.collectionName,
+      infoURL: self.infoURL
+    )
   }
 }

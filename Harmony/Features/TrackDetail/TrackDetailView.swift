@@ -102,6 +102,7 @@ struct TrackDetailView: View {
     .padding()
     .background(Color.white.ignoresSafeArea())
     .onAppear {
+      store.send(.checkIsFavorite)
       store.send(.setMusicURL(store.track.url ?? ""))
     }
     .onReceive(Timer.publish(every: 1, on: .main, in: .default).autoconnect()) { _ in
@@ -118,7 +119,7 @@ struct TrackDetailView: View {
 
 #Preview {
   TrackDetailView(
-    store: Store(initialState: TrackDetailFeature.State(track: TrackResponse(id: 1, img: "", url: "", trackName: "rihanna", artistName: "rihanna", collectionName: "", infoURL: ""))) {
+    store: Store(initialState: TrackDetailFeature.State(track: TrackResponse(id: 1, img: "", url: "", trackName: "Rihanna", artistName: "Rihanna", collectionName: "", infoURL: ""))) {
       TrackDetailFeature()
     }
   )

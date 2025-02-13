@@ -11,8 +11,9 @@ import ComposableArchitecture
 @Reducer
 struct TrackDetailFeature {
 
-  @Dependency(\.musicPlayer) var musicPlayer
   @Dependency(\.openURL) var openURL
+  @Dependency(\.musicPlayer) var musicPlayer
+  @Dependency(\.favoriteService) var favoriteService
 
   @ObservableState
   struct State: Equatable {
@@ -35,6 +36,9 @@ struct TrackDetailFeature {
     case setInitialTime(Double, Double)
     case openURLResponse(TaskResult<Bool>)
     case dismissButtonTapped
+    case addFavorite(TrackResponse)
+    case deleteFavorite(TrackResponse)
+    case checkIsFavorite
     case playerControlAction(PlayerControlFeature.Action)
     case trackControlAction(TrackControlFeature.Action)
     case volumeControlAction(VolumeControlFeature.Action)
@@ -89,6 +93,25 @@ struct TrackDetailFeature {
           }
         }
         return .none
+      case .addFavorite(let track):
+        return .run { send in
+          do {
+            try favoriteService.addFavorite(item: track)
+          } catch {
+            print(error)
+          }
+        }
+      case .deleteFavorite(let track):
+        return .run { send in
+          do {
+            try favoriteService.deleteFavorite(item: track)
+          } catch {
+            print(error)
+          }
+        }
+      case .checkIsFavorite:
+        state.trackControlState.isFavorite = favoriteService.isFavorite(trackID: state.track.id)
+        return .none
       case .openURLResponse(.success(_)):
         musicPlayer.pause()
         return .none
@@ -121,6 +144,12 @@ struct TrackDetailFeature {
         return .none
       case .trackControlAction(.setPlayStatus(_)):
         return .none
+      case .trackControlAction(.favoriteButtonTapped(let isFavorite)):
+        if isFavorite {
+          return .send(.addFavorite(state.track))
+        } else {
+          return .send(.deleteFavorite(state.track))
+        }
       case .trackControlAction(.infoButtonTapped):
         guard let url = URL(string: state.track.infoURL ?? "") else { return .none }
         return .run { send in

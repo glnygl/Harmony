@@ -43,9 +43,11 @@ struct TrackListRowView: View {
       }
       .padding(.leading, 4)
     }
+    .frame(maxWidth: .infinity, alignment: .leading)
+    .contentShape(Rectangle())
   }
 }
 
 #Preview {
-  TrackListRowView(track: TrackResponse(id: 1, img: "", url: "", trackName: "rihanna", artistName: "rihanna", collectionName: "", infoURL: ""))
+  TrackListRowView(track: TrackResponse(id: 1, img: "", url: "", trackName: "Rihanna", artistName: "Rihanna", collectionName: "", infoURL: ""))
 }

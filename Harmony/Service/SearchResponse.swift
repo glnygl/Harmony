@@ -25,4 +25,16 @@ struct TrackResponse: Codable, Equatable {
     case infoURL = "trackViewUrl"
     case trackName, artistName, collectionName
   }
+
+  func toFavoriteTrack() -> FavoriteTrack {
+    return FavoriteTrack(
+      id: self.id,
+      img: self.img,
+      url: self.url,
+      trackName: self.trackName,
+      artistName: self.artistName,
+      collectionName: self.collectionName,
+      infoURL: self.infoURL
+    )
+  }
 }
