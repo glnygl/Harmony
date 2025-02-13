@@ -65,7 +65,7 @@ struct TrackDetailFeature {
         return .send(.playerControlAction(.playPauseTapped(true)))
       case .seek(let current):
         state.currentTime = current
-        musicPlayer.seek(to: current)
+        musicPlayer.seek(current)
         return .none
       case let .updateTime(time):
         state.currentTime = time
@@ -107,16 +107,16 @@ struct TrackDetailFeature {
       case .playerControlAction(.rewindTapped):
         if state.currentTime < 10 {
           state.currentTime = 0
-          musicPlayer.seek(to: state.currentTime)
+          musicPlayer.seek(state.currentTime)
         } else {
           state.currentTime -= 10
-          musicPlayer.seek(to: state.currentTime)
+          musicPlayer.seek(state.currentTime)
         }
         return .none
       case .playerControlAction(.forwardTapped):
         if state.currentTime + 10 <= state.totalDuration {
           state.currentTime += 10
-          musicPlayer.seek(to: state.currentTime)
+          musicPlayer.seek(state.currentTime)
         }
         return .none
       case .trackControlAction(.setPlayStatus(_)):

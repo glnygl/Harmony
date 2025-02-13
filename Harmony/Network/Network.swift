@@ -7,41 +7,19 @@
 
 import Foundation
 
-protocol NetworkProtocol {
-  func perform<T:Decodable>(_ request: Request, responseType: T.Type) async throws -> T
+struct NetworkService {
+  var perform: @Sendable (Request) async throws -> Data
 }
 
-final class Network: NetworkProtocol {
+extension NetworkService {
 
-  private let urlSession: URLSession
-  private let decoder: Decoder
+  static let live = NetworkService(perform: { request in
+    let urlSession = URLSession.shared
+    let (data, response) = try await urlSession.data(for: request.asURLRequest())
 
-  init(urlSession: URLSession = URLSession.shared, decoder: Decoder = ResponseDecoder()) {
-    self.urlSession = urlSession
-    self.decoder = decoder
-  }
-
-  func perform<T:Decodable>(_ request: Request, responseType: T.Type) async throws(Error) -> T {
-    do {
-      let (data, response) = try await urlSession.data(for: request.asURLRequest())
-      guard let _ = response as? HTTPURLResponse else {
-        throw NetworkError.invalidResponse
-      }
-      let parsedData = try parseResponse(data: data, responseType: T.self)
-      return parsedData
+    guard let httpResponse = response as? HTTPURLResponse, (200...299).contains(httpResponse.statusCode) else {
+      throw NetworkError.invalidResponse
     }
-    catch {
-      throw error
-    }
-  }
-}
-
-extension Network {
-  private func parseResponse<T: Decodable>(data: Data, responseType: T.Type) throws -> T {
-    do {
-      return try decoder.decode(T.self, from: data)
-    } catch {
-      throw error
-    }
-  }
+    return data
+  })
 }

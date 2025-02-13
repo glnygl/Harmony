@@ -126,11 +126,11 @@ struct TrackListFeature {
 
   private func searchTrackList(_ searchText: String) async throws -> SearchResponse {
     let request = SearchRequest(searchText: searchText)
-    return try await musicService.fetchSearchResponse(request: request)
+    return try await musicService.fetchSearchResponse(request)
   }
 
   private func getGenreTrackList(_ genre: MusicGenre) async throws -> SearchResponse {
     let request = GenreRequest(genre: genre.rawValue)
-    return try await musicService.fetchGenreResponse(request: request)
+    return try await musicService.fetchGenreResponse(request)
   }
 }

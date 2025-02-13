@@ -6,23 +6,35 @@
 //
 
 import Dependencies
+import AVFoundation
 
 extension DependencyValues {
-  var musicService: MusicServiceProtocol {
+
+  var networkService: NetworkService {
+    get { self[NetworkServiceKey.self] }
+    set { self[NetworkServiceKey.self] = newValue }
+  }
+
+  var musicService: MusicService {
     get { self[MusicServiceKey.self] }
     set { self[MusicServiceKey.self] = newValue }
   }
 
-  var musicPlayer: MusicPlayerProtocol {
+  var musicPlayer: MusicPlayerService {
     get { self[MusicPlayerKey.self] }
     set { self[MusicPlayerKey.self] = newValue }
   }
 }
 
+private enum NetworkServiceKey: DependencyKey {
+  static let liveValue: NetworkService = .live
+}
+
+
 private enum MusicServiceKey: DependencyKey {
-  static let liveValue: MusicServiceProtocol = MusicService()
+  static let liveValue: MusicService = .live(network: .live)
 }
 
 private enum MusicPlayerKey: DependencyKey {
-  static let liveValue: MusicPlayerProtocol = MusicPlayerService()
+  static let liveValue: MusicPlayerService = .live(player: AVPlayer())
 }
