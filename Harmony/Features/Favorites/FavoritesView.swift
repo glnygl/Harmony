@@ -22,7 +22,7 @@ struct FavoritesView: View {
             VStack(spacing: 4) {
               Text("No Favorites")
                 .font(.system(size: 18, weight: .semibold))
-              Text("You can add items to your favorites by clicking heart button.")
+              Text("You can add tracks to your favorites by clicking heart button.")
                 .font(.system(size: 16))
                 .multilineTextAlignment(.center)
                 .foregroundStyle(.gray)

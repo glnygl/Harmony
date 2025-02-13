@@ -101,16 +101,8 @@
         }
       }
     },
-    "You can add items to your favorites by clicking heart button." : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "tr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Müzikleri kalp butonuna basarak favorilere ekleyebilirsiniz."
-          }
-        }
-      }
+    "You can add tracks to your favorites by clicking heart button." : {
+
     }
   },
   "version" : "1.0"
