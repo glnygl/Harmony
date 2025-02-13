@@ -71,6 +71,11 @@ struct TrackDetailView: View {
         }
         .offset(x: -30, y: -20)
       })
+      .popover(isPresented: $store.showPopover, attachmentAnchor: .point(.center), arrowEdge: .top) {
+          Text(store.track.collectionName ?? "")
+          .padding()
+          .presentationCompactAdaptation(.popover)
+      }
 
       VStack(spacing: 8) {
         Text(store.track.trackName ?? "")
@@ -109,11 +114,6 @@ struct TrackDetailView: View {
       if store.playerControlState.isPlaying {
         store.send(.updateTime(store.currentTime + 1))
       }
-    }
-    .popover(isPresented: $store.showPopover, attachmentAnchor: .point(.center), arrowEdge: .top) {
-        Text(store.track.collectionName ?? "")
-        .padding()
-        .presentationCompactAdaptation(.popover)
     }
   }
 }
