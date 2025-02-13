@@ -110,10 +110,11 @@ struct TrackDetailView: View {
         store.send(.updateTime(store.currentTime + 1))
       }
     }
-    .popover(isPresented: $store.showPopover) {
+    .popover(isPresented: $store.showPopover, attachmentAnchor: .point(.center), arrowEdge: .top) {
         Text(store.track.collectionName ?? "")
-         // .presentationCompactAdaptation(.popover)
-      }
+        .padding()
+        .presentationCompactAdaptation(.popover)
+    }
   }
 }
 
