@@ -28,4 +28,5 @@
 ## Roadmap
 
 - Currently Playing 
-- Switch Between Songs 
+- Switch Between Songs
+- Pagination
