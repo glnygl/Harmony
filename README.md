@@ -24,3 +24,8 @@
 - Swift
 - SwiftUI
 - SwiftData
+
+## Roadmap
+
+- Currently Playing 
+- Switch Between Songs 
