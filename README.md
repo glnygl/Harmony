@@ -1,5 +1,7 @@
 # Harmony
 
+![](harmonyBanner.png)
+
 ## Requirements
 - iOS 18.0+
 
