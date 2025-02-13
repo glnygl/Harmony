@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import SwiftData
 import ComposableArchitecture
 
 @main
@@ -16,6 +17,7 @@ struct HarmonyApp: App {
   var body: some Scene {
     WindowGroup {
       AppView(store: store)
+        .modelContainer(for: [TrackModel.self])
     }
   }
 }
