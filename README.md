@@ -12,7 +12,7 @@
 - Add To Favorites
 
 ## API
-- iTunes Search API (https://itunes.apple.com/search))
+- iTunes Search API (https://itunes.apple.com/search)
 
  ## Packages
 - NukeUI 
