@@ -10,7 +10,7 @@ import ComposableArchitecture
 
 struct PlayerControlView: View {
 
-  var store: StoreOf<PlayerControlFeature>
+  let store: StoreOf<PlayerControlFeature>
 
     var body: some View {
       HStack(spacing: 28) {

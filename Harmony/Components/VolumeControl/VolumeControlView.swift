@@ -10,7 +10,7 @@ import ComposableArchitecture
 
 struct VolumeControlView: View {
   
-  var store: StoreOf<VolumeControlFeature>
+  let store: StoreOf<VolumeControlFeature>
   
   var body: some View {
     HStack {

@@ -10,7 +10,7 @@ import ComposableArchitecture
 
 struct PopularGenreView: View {
 
-  var store: StoreOf<PopularGenreFeature>
+  let store: StoreOf<PopularGenreFeature>
 
   var body: some View {
     VStack(alignment: .leading, spacing: 14) {

@@ -10,7 +10,7 @@ import ComposableArchitecture
 
 struct TrackControlView: View {
 
-  var store: StoreOf<TrackControlFeature>
+  let store: StoreOf<TrackControlFeature>
 
     var body: some View {
       HStack(spacing: 60) {

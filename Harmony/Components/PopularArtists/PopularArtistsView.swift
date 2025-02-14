@@ -16,7 +16,7 @@ struct Artist: Equatable {
 
 struct PopularArtistsView: View {
 
-  var store: StoreOf<PopularArtistsFeature>
+  let store: StoreOf<PopularArtistsFeature>
 
   var body: some View {
     VStack(alignment: .leading, spacing: 10) {
