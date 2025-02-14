@@ -41,6 +41,10 @@ struct TrackListFeature {
 
   var body: some ReducerOf<Self> {
     BindingReducer()
+
+    Scope(state: \.popularGenresState, action: \.popularGenresAction) { PopularGenreFeature() }
+    Scope(state: \.popularArtistsState, action: \.popularArtistsAction) { PopularArtistsFeature() }
+
     Reduce { state, action in
       switch action {
       case .binding(\.searchText):
@@ -118,9 +122,6 @@ struct TrackListFeature {
     }
 
     .ifLet(\.$trackDetailState, action: \.showTrackDetail) { TrackDetailFeature() }
-
-    Scope(state: \.popularGenresState, action: \.popularGenresAction) { PopularGenreFeature() }
-    Scope(state: \.popularArtistsState, action: \.popularArtistsAction) { PopularArtistsFeature() }
 
   }
 

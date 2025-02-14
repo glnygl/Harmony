@@ -46,6 +46,11 @@ struct TrackDetailFeature {
 
   var body: some ReducerOf<Self> {
     BindingReducer()
+
+    Scope(state: \.playerControlState, action: \.playerControlAction) { PlayerControlFeature() }
+    Scope(state: \.trackControlState, action: \.trackControlAction) { TrackControlFeature() }
+    Scope(state: \.volumeControlState, action: \.volumeControlAction) { VolumeControlFeature() }
+
     Reduce { state, action in
       switch action {
       case .binding(\.showPopover):
@@ -114,7 +119,7 @@ struct TrackDetailFeature {
         return .none
       case .openURLResponse(.success(_)):
         musicPlayer.pause()
-        return .none
+        return .send(.playerControlAction(.playPauseTapped(false)))
       case .openURLResponse(.failure(_)):
         return .none
       case .dismissButtonTapped:
@@ -176,9 +181,5 @@ struct TrackDetailFeature {
         return .none
       }
     }
-
-    Scope(state: \.playerControlState, action: \.playerControlAction) { PlayerControlFeature() }
-    Scope(state: \.trackControlState, action: \.trackControlAction) { TrackControlFeature() }
-    Scope(state: \.volumeControlState, action: \.volumeControlAction) { VolumeControlFeature() }
   }
 }

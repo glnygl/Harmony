@@ -30,11 +30,11 @@ struct AppFeature {
 
   var body: some ReducerOf<Self> {
 
+    Scope(state: \.listState, action: \.listAction) { TrackListFeature() }
+    Scope(state: \.favoritesState, action: \.favoritesAction) { FavoritesFeature() }
+
     Reduce { state, action in
       return .none
     }
-
-    Scope(state: \.listState, action: \.listAction) { TrackListFeature() }
-    Scope(state: \.favoritesState, action: \.favoritesAction) { FavoritesFeature() }
   }
 }
