@@ -65,6 +65,9 @@ struct TrackListView: View {
         }
       }
       .searchable(text: $store.searchText, prompt: "What do you want to listen to?")
+      .onChange(of: store.searchText) { 
+          store.send(.searchTrackList)
+      }
       .searchFocused($isSearchFocused)
       .navigationTitle("Discover")
       .navigationBarTitleDisplayMode(.inline)

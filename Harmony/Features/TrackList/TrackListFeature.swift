@@ -12,8 +12,6 @@ struct TrackListFeature {
 
   @Dependency(\.musicService) var musicService
 
-  private enum CancelID { case debounce }
-
   @ObservableState
   struct State: Equatable {
     var searchText: String = ""
@@ -48,24 +46,9 @@ struct TrackListFeature {
     Reduce { state, action in
       switch action {
       case .binding(\.searchText):
-        return .run { send in
-          try await Task.sleep(for: .milliseconds(300))
-          await send(.searchTrackList)
-        }
-        .cancellable(id: CancelID.debounce)
+        return .none
       case .searchTrackList:
-        guard !state.searchText.isEmpty else {
-          return .send(.cancelSearch)
-        }
-        state.error = ""
-        state.isLoading = true
-        return .run { [text = state.searchText ]send in
-          await send(
-            .setTrackListResponse(
-              TaskResult {
-                try await searchTrackList(text)
-              }))
-        }
+        return performSearch(&state)
       case .listRowSelected(let track):
         state.trackDetailState = TrackDetailFeature.State(track: track)
         return .none
@@ -73,49 +56,28 @@ struct TrackListFeature {
         state.trackDetailState = nil
         return .none
       case .setTrackListResponse(.success(let response)):
-        state.error = ""
-        state.isLoading = false
+        updateLoadingState(&state, isLoading: false)
         state.trackList = response.results
         return .none
       case .setTrackListResponse(.failure(let error)):
-        state.isLoading = false
-        state.error = error.localizedDescription
+        updateLoadingState(&state, isLoading: false, error: error.localizedDescription)
         return .none
       case .setGenreTrackListResponse(.success(let response)):
-        state.error = ""
-        state.isLoading = false
+        updateLoadingState(&state, isLoading: false)
         state.searchText = state.selectedGenre?.title ?? ""
         state.trackList = response.results
         return .none
       case .setGenreTrackListResponse(.failure(let error)):
-        state.isLoading = false
-        state.error = error.localizedDescription
+        updateLoadingState(&state, isLoading: false, error: error.localizedDescription)
         return .none
       case .cancelSearch:
-         state.trackList = []
-         return .none
+        state.trackList = []
+        return .none
       case .popularArtistsAction(.artistSelected(let artistName)):
         state.searchText = artistName
-        state.error = ""
-        state.isLoading = true
-        return .run { [text = state.searchText ]send in
-          await send(
-            .setTrackListResponse(
-              TaskResult {
-                try await searchTrackList(text)
-              }))
-        }
+        return performSearch(&state)
       case .popularGenresAction(.genreSelected(let genre)):
-        state.error = ""
-        state.isLoading = true
-        state.selectedGenre = genre
-        return .run { send in
-          await send(
-            .setGenreTrackListResponse(
-              TaskResult {
-                try await getGenreTrackList(genre)
-              }))
-        }
+        return performGenreSearch(&state, genre: genre)
       default:
         return .none
       }
@@ -123,6 +85,27 @@ struct TrackListFeature {
 
     .ifLet(\.$trackDetailState, action: \.showTrackDetail) { TrackDetailFeature() }
 
+  }
+
+  private func performSearch(_ state: inout State) -> Effect<Action> {
+    guard !state.searchText.isEmpty else {
+      return .send(.cancelSearch)
+    }
+    let text = state.searchText
+    updateLoadingState(&state, isLoading: true)
+
+    return .run { send in
+      await send(.setTrackListResponse(TaskResult { try await searchTrackList(text) }))
+    }
+  }
+
+  private func performGenreSearch(_ state: inout State, genre: MusicGenre) -> Effect<Action> {
+      updateLoadingState(&state, isLoading: true)
+      state.selectedGenre = genre
+
+      return .run { send in
+          await send(.setGenreTrackListResponse(TaskResult { try await getGenreTrackList(genre) }))
+      }
   }
 
   private func searchTrackList(_ searchText: String) async throws -> SearchResponse {
@@ -133,5 +116,10 @@ struct TrackListFeature {
   private func getGenreTrackList(_ genre: MusicGenre) async throws -> SearchResponse {
     let request = GenreRequest(genre: genre.rawValue)
     return try await musicService.fetchGenreResponse(request)
+  }
+
+  private func updateLoadingState(_ state: inout State, isLoading: Bool, error: String = "") {
+    state.isLoading = isLoading
+    state.error = error
   }
 }
