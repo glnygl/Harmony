@@ -30,14 +30,7 @@ struct FavoritesFeature {
     Reduce { state, action in
       switch action {
       case .fetchFavorites:
-        return .run { send in
-          do {
-            let data = try favoriteService.getFavorites(limit: 10, offset: 0)
-            await send(.setTrackListResponse(.success(data)))
-          } catch {
-            await send(.setTrackListResponse(.failure(error)))
-          }
-        }
+        return fetchFavorites(&state)
       case .setTrackListResponse(.success(let response)):
         state.trackList = response
         return .none
@@ -55,5 +48,16 @@ struct FavoritesFeature {
       }
     }
     .ifLet(\.$trackDetailState, action: \.showTrackDetail) { TrackDetailFeature() }
+  }
+
+  private func fetchFavorites(_ state: inout State) -> Effect<Action> {
+    return .run { send in
+      do {
+        let data = try favoriteService.getFavorites(limit: 10, offset: 0)
+        await send(.setTrackListResponse(.success(data)))
+      } catch {
+        await send(.setTrackListResponse(.failure(error)))
+      }
+    }
   }
 }

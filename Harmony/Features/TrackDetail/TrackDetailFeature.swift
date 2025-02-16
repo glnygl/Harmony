@@ -58,15 +58,7 @@ struct TrackDetailFeature {
       case .binding(_):
         return .none
       case .setMusicURL(let url):
-        state.musicURL = url
-        return .run { send in
-          do {
-            let duration = try await musicPlayer.setURL(url)
-            await send(.setInitialTime(musicPlayer.currentTime(), duration))
-          } catch {
-            print(error)
-          }
-        }
+        return setMusicURL(&state, url: url)
       case .setInitialTime(let current, let duration):
         state.currentTime = current
         state.totalDuration = duration
@@ -77,43 +69,11 @@ struct TrackDetailFeature {
         musicPlayer.seek(current)
         return .none
       case let .updateTime(time):
-        state.currentTime = time
-        if time >= state.totalDuration {
-          if state.trackControlState.playStatus == .once {
-            return .run { send in
-              await send(.seek(0))
-              await send(.playerControlAction(.playPauseTapped(false)))
-            }
-          } else if state.trackControlState.playStatus == .again {
-            state.trackControlState.playStatus = .once
-            return .run { send in
-              await send(.seek(0))
-              await send(.playerControlAction(.playPauseTapped(true)))
-            }
-          } else {
-            return .run { send in
-              await send(.seek(0))
-              await send(.playerControlAction(.playPauseTapped(true)))
-            }
-          }
-        }
-        return .none
+        return setCurrentTime(&state, time: time)
       case .addFavorite(let track):
-        return .run { send in
-          do {
-            try favoriteService.addFavorite(item: track)
-          } catch {
-            print(error)
-          }
-        }
+        return addFavorite(&state, track: track)
       case .deleteFavorite(let track):
-        return .run { send in
-          do {
-            try favoriteService.deleteFavorite(item: track)
-          } catch {
-            print(error)
-          }
-        }
+        return deleteFavorite(&state, track: track)
       case .checkIsFavorite:
         state.trackControlState.isFavorite = favoriteService.isFavorite(trackID: state.track.id)
         return .none
@@ -133,19 +93,10 @@ struct TrackDetailFeature {
         }
         return .none
       case .playerControlAction(.rewindTapped):
-        if state.currentTime < 10 {
-          state.currentTime = 0
-          musicPlayer.seek(state.currentTime)
-        } else {
-          state.currentTime -= 10
-          musicPlayer.seek(state.currentTime)
-        }
+        setForwardState(&state, isRewind: true)
         return .none
       case .playerControlAction(.forwardTapped):
-        if state.currentTime + 10 <= state.totalDuration {
-          state.currentTime += 10
-          musicPlayer.seek(state.currentTime)
-        }
+        setForwardState(&state, isRewind: false)
         return .none
       case .trackControlAction(.setPlayStatus(_)):
         return .none
@@ -156,30 +107,94 @@ struct TrackDetailFeature {
           return .send(.deleteFavorite(state.track))
         }
       case .trackControlAction(.infoButtonTapped):
-        guard let url = URL(string: state.track.infoURL ?? "") else { return .none }
-        return .run { send in
-          await send(.openURLResponse(
-            TaskResult {
-              await openURL(url)
-            }
-          ))
-        }
+        return redirectURL(&state)
       case .trackControlAction(.muteVolume(let value)):
-        state.trackControlState.isMute = value
-
-        if value {
-          state.volumeControlState.previousVolume = state.volumeControlState.volume
-          state.volumeControlState.volume = 0
-        } else {
-          state.volumeControlState.volume = state.volumeControlState.previousVolume
-        }
-
-        return .send(.volumeControlAction(.updateVolume(state.volumeControlState.volume)))
+        return setMuteState(&state, isMute: value)
       case .volumeControlAction(.updateVolume(let volume)):
         musicPlayer.setVolume(volume)
         state.trackControlState.isMute = (volume == 0)
         return .none
       }
     }
+  }
+
+  private func setMusicURL(_ state: inout State, url: String) -> Effect<Action> {
+    state.musicURL = url
+    return .run { send in
+      do {
+        let duration = try await musicPlayer.setURL(url)
+        await send(.setInitialTime(musicPlayer.currentTime(), duration))
+      } catch {
+        print(error)
+      }
+    }
+  }
+
+  private func setCurrentTime(_ state: inout State, time: Double) -> Effect<Action> {
+    state.currentTime = time
+    if time >= state.totalDuration {
+      let shouldPause = (state.trackControlState.playStatus == .once)
+      if state.trackControlState.playStatus == .again {
+        state.trackControlState.playStatus = .once
+      }
+
+      return .run { send in
+        await send(.seek(0))
+        await send(.playerControlAction(.playPauseTapped(!shouldPause)))
+      }
+    }
+    return .none
+  }
+
+  private func addFavorite(_ state: inout State, track: TrackResponse) -> Effect<Action> {
+    return .run { send in
+      do {
+        try favoriteService.addFavorite(item: track)
+      } catch {
+        print(error)
+      }
+    }
+  }
+
+  private func deleteFavorite(_ state: inout State, track: TrackResponse) -> Effect<Action> {
+    return .run { send in
+      do {
+        try favoriteService.deleteFavorite(item: track)
+      } catch {
+        print(error)
+      }
+    }
+  }
+
+  private func setForwardState(_ state: inout State, isRewind: Bool) {
+    if isRewind {
+      state.currentTime = max(0, state.currentTime - 10)
+    } else if state.currentTime + 10 <= state.totalDuration {
+      state.currentTime += 10
+    }
+    musicPlayer.seek(state.currentTime)
+  }
+
+  private func redirectURL(_ state: inout State) -> Effect<Action> {
+    guard let url = URL(string: state.track.infoURL ?? "") else { return .none }
+    return .run { send in
+      await send(.openURLResponse(
+        TaskResult {
+          await openURL(url)
+        }
+      ))
+    }
+  }
+
+  private func setMuteState(_ state: inout State, isMute: Bool) -> Effect<Action> {
+    state.trackControlState.isMute = isMute
+
+    if isMute {
+      state.volumeControlState.previousVolume = state.volumeControlState.volume
+      state.volumeControlState.volume = 0
+    } else {
+      state.volumeControlState.volume = state.volumeControlState.previousVolume
+    }
+    return .send(.volumeControlAction(.updateVolume(state.volumeControlState.volume)))
   }
 }
