@@ -10,11 +10,11 @@ import ComposableArchitecture
 
 @Reducer
 struct TrackDetailFeature {
-
+  
   @Dependency(\.openURL) var openURL
   @Dependency(\.musicPlayer) var musicPlayer
   @Dependency(\.favoriteService) var favoriteService
-
+  
   @ObservableState
   struct State: Equatable {
     var track: TrackResponse
@@ -27,7 +27,7 @@ struct TrackDetailFeature {
     var trackControlState = TrackControlFeature.State()
     var volumeControlState = VolumeControlFeature.State()
   }
-
+  
   enum Action: BindableAction {
     case binding(BindingAction<State>)
     case setMusicURL(String)
@@ -43,14 +43,14 @@ struct TrackDetailFeature {
     case trackControlAction(TrackControlFeature.Action)
     case volumeControlAction(VolumeControlFeature.Action)
   }
-
+  
   var body: some ReducerOf<Self> {
     BindingReducer()
-
+    
     Scope(state: \.playerControlState, action: \.playerControlAction) { PlayerControlFeature() }
     Scope(state: \.trackControlState, action: \.trackControlAction) { TrackControlFeature() }
     Scope(state: \.volumeControlState, action: \.volumeControlAction) { VolumeControlFeature() }
-
+    
     Reduce { state, action in
       switch action {
       case .binding(\.showPopover):
@@ -117,7 +117,7 @@ struct TrackDetailFeature {
       }
     }
   }
-
+  
   private func setMusicURL(_ state: inout State, url: String) -> Effect<Action> {
     state.musicURL = url
     return .run { send in
@@ -129,7 +129,7 @@ struct TrackDetailFeature {
       }
     }
   }
-
+  
   private func setCurrentTime(_ state: inout State, time: Double) -> Effect<Action> {
     state.currentTime = time
     if time >= state.totalDuration {
@@ -137,7 +137,7 @@ struct TrackDetailFeature {
       if state.trackControlState.playStatus == .again {
         state.trackControlState.playStatus = .once
       }
-
+      
       return .run { send in
         await send(.seek(0))
         await send(.playerControlAction(.playPauseTapped(!shouldPause)))
@@ -145,7 +145,7 @@ struct TrackDetailFeature {
     }
     return .none
   }
-
+  
   private func addFavorite(_ state: inout State, track: TrackResponse) -> Effect<Action> {
     return .run { send in
       do {
@@ -155,7 +155,7 @@ struct TrackDetailFeature {
       }
     }
   }
-
+  
   private func deleteFavorite(_ state: inout State, track: TrackResponse) -> Effect<Action> {
     return .run { send in
       do {
@@ -165,7 +165,7 @@ struct TrackDetailFeature {
       }
     }
   }
-
+  
   private func setForwardState(_ state: inout State, isRewind: Bool) {
     if isRewind {
       state.currentTime = max(0, state.currentTime - 10)
@@ -174,7 +174,7 @@ struct TrackDetailFeature {
     }
     musicPlayer.seek(state.currentTime)
   }
-
+  
   private func redirectURL(_ state: inout State) -> Effect<Action> {
     guard let url = URL(string: state.track.infoURL ?? "") else { return .none }
     return .run { send in
@@ -185,10 +185,10 @@ struct TrackDetailFeature {
       ))
     }
   }
-
+  
   private func setMuteState(_ state: inout State, isMute: Bool) -> Effect<Action> {
     state.trackControlState.isMute = isMute
-
+    
     if isMute {
       state.volumeControlState.previousVolume = state.volumeControlState.volume
       state.volumeControlState.volume = 0

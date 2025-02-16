@@ -9,23 +9,23 @@ import ComposableArchitecture
 
 @Reducer
 struct FavoritesFeature {
-
+  
   @Dependency(\.favoriteService) var favoriteService
-
+  
   @ObservableState
   struct State: Equatable {
     var trackList: [TrackResponse] =  []
     var error: String = ""
     @Presents var trackDetailState: TrackDetailFeature.State?
   }
-
+  
   enum Action {
     case fetchFavorites
     case listRowSelected(TrackResponse)
     case showTrackDetail(PresentationAction<TrackDetailFeature.Action>)
     case setTrackListResponse(TaskResult<[TrackResponse]>)
   }
-
+  
   var body: some ReducerOf<Self> {
     Reduce { state, action in
       switch action {
@@ -49,7 +49,7 @@ struct FavoritesFeature {
     }
     .ifLet(\.$trackDetailState, action: \.showTrackDetail) { TrackDetailFeature() }
   }
-
+  
   private func fetchFavorites(_ state: inout State) -> Effect<Action> {
     return .run { send in
       do {

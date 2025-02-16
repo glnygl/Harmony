@@ -11,6 +11,9 @@ import ComposableArchitecture
 struct TrackListFeature {
 
   @Dependency(\.musicService) var musicService
+  @Dependency(\.continuousClock) var clock
+
+  private enum CancelID { case debounce }
 
   @ObservableState
   struct State: Equatable {
@@ -89,23 +92,25 @@ struct TrackListFeature {
 
   private func performSearch(_ state: inout State) -> Effect<Action> {
     guard !state.searchText.isEmpty else {
-      return .send(.cancelSearch)
+      return .cancel(id: CancelID.debounce)
+        .merge(with: .send(.cancelSearch))
     }
     let text = state.searchText
     updateLoadingState(&state, isLoading: true)
 
     return .run { send in
+      try await self.clock.sleep(for: .seconds(2))
       await send(.setTrackListResponse(TaskResult { try await searchTrackList(text) }))
-    }
+    }.cancellable(id: CancelID.debounce, cancelInFlight: true)
   }
 
   private func performGenreSearch(_ state: inout State, genre: MusicGenre) -> Effect<Action> {
-      updateLoadingState(&state, isLoading: true)
-      state.selectedGenre = genre
+    updateLoadingState(&state, isLoading: true)
+    state.selectedGenre = genre
 
-      return .run { send in
-          await send(.setGenreTrackListResponse(TaskResult { try await getGenreTrackList(genre) }))
-      }
+    return .run { send in
+      await send(.setGenreTrackListResponse(TaskResult { try await getGenreTrackList(genre) }))
+    }
   }
 
   private func searchTrackList(_ searchText: String) async throws -> SearchResponse {
