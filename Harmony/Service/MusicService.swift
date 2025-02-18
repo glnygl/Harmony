@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import ComposableArchitecture
 
 struct MusicService {
   var fetchSearchResponse: @Sendable (SearchRequest) async throws -> SearchResponse
@@ -13,8 +14,10 @@ struct MusicService {
 }
 
 extension MusicService {
-  static func live(network: NetworkService) -> MusicService {
-    MusicService(
+  static var liveValue: MusicService {
+    @Dependency(\.networkService) var network
+
+    return Self(
       fetchSearchResponse: { request in
         let data = try await network.perform(request)
         return try JSONDecoder().decode(SearchResponse.self, from: data)

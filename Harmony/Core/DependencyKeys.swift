@@ -33,15 +33,15 @@ extension DependencyValues {
 }
 
 private enum NetworkServiceKey: DependencyKey {
-  static let liveValue: NetworkService = .live
+  static let liveValue: NetworkService = .liveValue
 }
 
 private enum MusicServiceKey: DependencyKey {
-  static let liveValue: MusicService = .live(network: .live)
+  static let liveValue: MusicService = .liveValue
 }
 
 private enum MusicPlayerKey: DependencyKey {
-  static let liveValue: MusicPlayerService = .live(player: AVPlayer())
+  static let liveValue: MusicPlayerService = .liveValue
 }
 
 private enum FavoriteServiceKey: DependencyKey {

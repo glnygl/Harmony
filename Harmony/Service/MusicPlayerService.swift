@@ -24,29 +24,37 @@ struct MusicPlayerService {
 }
 
 extension MusicPlayerService {
-  static func live(player: AVPlayer) -> MusicPlayerService {
-    return MusicPlayerService(
+
+  static var liveValue: MusicPlayerService {
+    let player = AVPlayer()
+    return Self(
       play: {
         player.play()
-      }, pause: {
+      },
+      pause: {
         player.pause()
-      }, setVolume: { volume in
+      },
+      setVolume: { volume in
         player.volume = Float(volume)
-      }, seek: { time in
+      },
+      seek: { time in
         let cmTime = CMTime(seconds: time, preferredTimescale: 600)
         player.seek(to: cmTime)
-      }, currentTime: {
+      },
+      currentTime: {
         player.currentItem?.currentTime().seconds ?? 0
-      }, duration: {
+      },
+      duration: {
         player.currentItem?.duration.seconds ?? 0
-      }, setURL: { urlString in
+      },
+      setURL: { urlString in
         guard let url = URL(string: urlString) else {
           throw MusicPlayerError.invalidURL
         }
-        
+
         let playerItem = AVPlayerItem(url: url)
         player.replaceCurrentItem(with: playerItem)
-        
+
         return try await withCheckedThrowingContinuation { continuation in
           var observer: NSKeyValueObservation?
           observer = playerItem.observe(\.status, options: [.new]) { item, _ in
@@ -67,4 +75,6 @@ extension MusicPlayerService {
       })
   }
 }
+
+
 

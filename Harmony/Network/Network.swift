@@ -13,7 +13,7 @@ struct NetworkService {
 
 extension NetworkService {
 
-  static let live = NetworkService(perform: { request in
+  static let liveValue = NetworkService(perform: { request in
     let urlSession = URLSession.shared
     let (data, response) = try await urlSession.data(for: request.asURLRequest())
 
