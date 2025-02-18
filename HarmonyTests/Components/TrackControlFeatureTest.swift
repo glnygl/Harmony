@@ -13,12 +13,11 @@ import ComposableArchitecture
 @MainActor
 struct TrackControlFeatureTest {
 
-  let store = TestStore(initialState: TrackControlFeature.State()) {
-    TrackControlFeature()
-  }
-
   @Test
   func testFavoriteButtonTappedAction() async {
+    let store = TestStore(initialState: TrackControlFeature.State()) {
+      TrackControlFeature()
+    }
 
     await store.send(.favoriteButtonTapped(true)) { state in
       state.isFavorite = true
@@ -27,11 +26,13 @@ struct TrackControlFeatureTest {
     await store.send(.favoriteButtonTapped(false)) { state in
       state.isFavorite = false
     }
-
   }
 
   @Test
   func testSetPlayerStatusAction() async {
+    let store = TestStore(initialState: TrackControlFeature.State()) {
+      TrackControlFeature()
+    }
 
     await store.send(.setPlayStatus(.once)) { state in
       state.playStatus = .again
@@ -44,11 +45,13 @@ struct TrackControlFeatureTest {
     await store.send(.setPlayStatus(.forever)) { state in
       state.playStatus = .once
     }
-
   }
 
   @Test
   func testMuteVolumeAction() async {
+    let store = TestStore(initialState: TrackControlFeature.State()) {
+      TrackControlFeature()
+    }
 
     await store.send(.muteVolume(true)) { state in
       state.isMute = true
@@ -57,11 +60,14 @@ struct TrackControlFeatureTest {
     await store.send(.muteVolume(false)) { state in
       state.isMute = false
     }
-
   }
 
   @Test
   func testInfoButtonTappedAction() async {
+    let store = TestStore(initialState: TrackControlFeature.State()) {
+      TrackControlFeature()
+    }
+
     await store.send(.infoButtonTapped)
   }
 }

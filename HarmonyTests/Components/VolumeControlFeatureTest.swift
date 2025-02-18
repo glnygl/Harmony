@@ -13,16 +13,14 @@ import ComposableArchitecture
 @MainActor
 struct VolumeControlFeatureTest {
 
-  let store = TestStore(initialState: VolumeControlFeature.State()) {
-    VolumeControlFeature()
-  }
-
   @Test
   func testUpdateVolumeAction() async {
+    let store = TestStore(initialState: VolumeControlFeature.State()) {
+      VolumeControlFeature()
+    }
 
     await store.send(.updateVolume(0.8)) { state in
       state.volume = 0.8
     }
-
   }
 }

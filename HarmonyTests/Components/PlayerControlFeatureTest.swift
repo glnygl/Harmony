@@ -13,12 +13,11 @@ import ComposableArchitecture
 @MainActor
 struct PlayerControlFeatureTest {
 
-  let store = TestStore(initialState: PlayerControlFeature.State()) {
-    PlayerControlFeature()
-  }
-
   @Test
   func testPlayPauseTappedAction() async {
+    let store = TestStore(initialState: PlayerControlFeature.State()) {
+      PlayerControlFeature()
+    }
 
     await store.send(.playPauseTapped(true)) { state in
       state.isPlaying = true
@@ -31,11 +30,19 @@ struct PlayerControlFeatureTest {
 
   @Test
   func testRewindTappedAction() async {
+    let store = TestStore(initialState: PlayerControlFeature.State()) {
+      PlayerControlFeature()
+    }
+
     await store.send(.rewindTapped)
   }
 
   @Test
   func testForwardTappedAction() async {
+    let store = TestStore(initialState: PlayerControlFeature.State()) {
+      PlayerControlFeature()
+    }
+    
     await store.send(.forwardTapped)
   }
 }

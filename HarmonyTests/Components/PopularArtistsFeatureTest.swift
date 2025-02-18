@@ -13,12 +13,12 @@ import ComposableArchitecture
 @MainActor
 struct PopularArtistsFeatureTest {
 
-  let store = TestStore(initialState: PopularArtistsFeature.State()) {
-    PopularArtistsFeature()
-  }
-
   @Test
   func testArtistsSelectedAction() async {
+    let store = TestStore(initialState: PopularArtistsFeature.State()) {
+      PopularArtistsFeature()
+    }
+    
     await store.send(.artistSelected("Rihanna"))
   }
 }
