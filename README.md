@@ -27,6 +27,8 @@
 
 ## Roadmap
 
+- SharingGRDB
 - Currently Playing 
 - Switch Between Songs
 - Pagination
+- Modularization 
