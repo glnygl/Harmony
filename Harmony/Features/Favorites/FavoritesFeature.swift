@@ -53,7 +53,7 @@ struct FavoritesFeature {
   private func fetchFavorites(_ state: inout State) -> Effect<Action> {
     return .run { send in
       do {
-        let data = try favoriteService.getFavorites(limit: 10, offset: 0)
+        let data = try await favoriteService.getFavorites(limit: 10, offset: 0)
         await send(.setTrackListResponse(.success(data)))
       } catch {
         await send(.setTrackListResponse(.failure(error)))

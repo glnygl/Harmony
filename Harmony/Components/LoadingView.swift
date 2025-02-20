@@ -8,9 +8,11 @@
 import SwiftUI
 
 struct LoadingView: View {
-
-  @State var activeIndex = 0
-
+  
+  @State private var activeIndex = 0
+  
+  let timer = Timer.publish(every: 0.2, on: .main, in: .common).autoconnect()
+  
   var body: some View {
     HStack {
       ForEach(0..<5) { index in
@@ -20,13 +22,7 @@ struct LoadingView: View {
           .animation(.spring(duration: 0.6), value: activeIndex)
       }
     }
-    .onAppear {
-      startTimer()
-    }
-  }
-
-  func startTimer() {
-    Timer.scheduledTimer(withTimeInterval: 0.2, repeats: true) { timer in
+    .onReceive(timer) { _ in
       activeIndex = (activeIndex + 1) % 5
     }
   }

@@ -39,6 +39,7 @@ struct TrackDetailFeature {
     case addFavorite(TrackResponse)
     case deleteFavorite(TrackResponse)
     case checkIsFavorite
+    case checkIsFavoriteResponse(Bool)
     case playerControlAction(PlayerControlFeature.Action)
     case trackControlAction(TrackControlFeature.Action)
     case volumeControlAction(VolumeControlFeature.Action)
@@ -75,7 +76,12 @@ struct TrackDetailFeature {
       case .deleteFavorite(let track):
         return deleteFavorite(&state, track: track)
       case .checkIsFavorite:
-        state.trackControlState.isFavorite = favoriteService.isFavorite(trackID: state.track.id)
+        let trackId = state.track.id
+        return .run { send in
+          await send(.checkIsFavoriteResponse(favoriteService.isFavorite(trackID: trackId)))
+        }
+      case .checkIsFavoriteResponse(let isFavorite):
+        state.trackControlState.isFavorite = isFavorite
         return .none
       case .openURLResponse(.success(_)):
         musicPlayer.pause()
@@ -149,7 +155,7 @@ struct TrackDetailFeature {
   private func addFavorite(_ state: inout State, track: TrackResponse) -> Effect<Action> {
     return .run { send in
       do {
-        try favoriteService.addFavorite(item: track)
+        try await favoriteService.addFavorite(item: track)
       } catch {
         print(error)
       }
@@ -159,7 +165,7 @@ struct TrackDetailFeature {
   private func deleteFavorite(_ state: inout State, track: TrackResponse) -> Effect<Action> {
     return .run { send in
       do {
-        try favoriteService.deleteFavorite(item: track)
+        try await favoriteService.deleteFavorite(item: track)
       } catch {
         print(error)
       }
