@@ -8,20 +8,22 @@
 import SwiftData
 import Foundation
 
-protocol FavoriteServiceProtocol {
-  func addFavorite(item: TrackResponse) throws
-  func deleteFavorite(item: TrackResponse) throws
-  func getFavorites(limit: Int, offset: Int) throws -> [TrackResponse]
-  func isFavorite(trackID: Int) -> Bool
+protocol FavoriteServiceProtocol: Sendable {
+  func addFavorite(item: TrackResponse) async throws
+  func deleteFavorite(item: TrackResponse) async throws
+  func getFavorites(limit: Int, offset: Int) async throws -> [TrackResponse]
+  func isFavorite(trackID: Int) async -> Bool
 }
 
-final class FavoriteService: FavoriteServiceProtocol {
+final actor FavoriteService: FavoriteServiceProtocol {
   private let context: ModelContext
   private var favoriteIDs: Set<Int> = []
 
   init(context: ModelContext) {
     self.context = context
-    loadFavorites()
+    Task {
+      await loadFavorites()
+    }
   }
 
   func addFavorite(item: TrackResponse) throws {

@@ -9,7 +9,7 @@ struct SearchResponse: Codable {
   let results: [TrackResponse]
 }
 
-struct TrackResponse: Codable, Equatable {
+struct TrackResponse: Codable, Equatable, Sendable {
   let id: Int
   let img: String?
   let url: String?

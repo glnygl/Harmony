@@ -6,6 +6,7 @@
 //
 
 import AVFoundation
+import ConcurrencyExtras
 
 enum MusicPlayerError: LocalizedError {
   case invalidURL
@@ -55,24 +56,27 @@ extension MusicPlayerService {
         let playerItem = AVPlayerItem(url: url)
         player.replaceCurrentItem(with: playerItem)
 
-        return try await withCheckedThrowingContinuation { continuation in
-          var observer: NSKeyValueObservation?
-          observer = playerItem.observe(\.status, options: [.new]) { item, _ in
-            if item.status == .readyToPlay {
-              let duration = item.duration.seconds
-              if duration.isFinite {
-                continuation.resume(returning: duration)
-              } else {
-                continuation.resume(throwing: MusicPlayerError.invalidDuration)
+          return try await withCheckedThrowingContinuation { continuation in
+              let observer: LockIsolated<NSKeyValueObservation?> = LockIsolated(nil)
+              observer.withValue {
+                  $0 = playerItem.observe(\.status, options: [.new]) { item, _ in
+                  if item.status == .readyToPlay {
+                      let duration = item.duration.seconds
+                      if duration.isFinite {
+                          continuation.resume(returning: duration)
+                      } else {
+                          continuation.resume(throwing: MusicPlayerError.invalidDuration)
+                      }
+                      observer.value?.invalidate()
+                  } else if item.status == .failed {
+                      continuation.resume(throwing: MusicPlayerError.failed(item.error?.localizedDescription ?? "failed"))
+                      observer.value?.invalidate()
+                  }
               }
-              observer?.invalidate()
-            } else if item.status == .failed {
-              continuation.resume(throwing: MusicPlayerError.failed(item.error?.localizedDescription ?? "failed"))
-              observer?.invalidate()
-            }
+              }
           }
-        }
-      })
+      }
+    )
   }
 }
 
