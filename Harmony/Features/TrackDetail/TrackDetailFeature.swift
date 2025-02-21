@@ -99,9 +99,9 @@ struct TrackDetailFeature {
           let track = state.track
           return .run { _ in
             if isFavorite {
-              try await self.favoriteService.addFavorite(item: track)
+              try await self.favoriteService.addFavorite(track)
             } else {
-              try await self.favoriteService.deleteFavorite(item: track)
+              try await self.favoriteService.deleteFavorite(track)
             }
           } catch: { _, error in
             // Handle later on
