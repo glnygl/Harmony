@@ -28,7 +28,7 @@ struct TrackResponse: Codable, Equatable, Sendable {
 
   func toFavoriteTrack() -> FavoriteTrack {
     return FavoriteTrack(
-      id: self.id,
+      id: Int64(self.id),
       img: self.img,
       url: self.url,
       trackName: self.trackName,

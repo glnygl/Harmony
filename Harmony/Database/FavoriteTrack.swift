@@ -5,12 +5,12 @@
 //  Created by Glny Gl on 12/02/2025.
 //
 
-import SwiftData
+import GRDB
 
-@Model
-final class FavoriteTrack {
+struct FavoriteTrack: Codable, FetchableRecord, PersistableRecord, Sendable {
+  static let databaseTableName = "favorites" // Define table name
 
-  @Attribute(.unique) var id: Int
+  var id: Int64
   var img: String?
   var url: String?
   var trackName: String?
@@ -18,19 +18,9 @@ final class FavoriteTrack {
   var collectionName: String?
   var infoURL: String?
 
-  init(id: Int, img: String? = nil, url: String? = nil, trackName: String? = nil, artistName: String? = nil, collectionName: String? = nil, infoURL: String? = nil) {
-    self.id = id
-    self.img = img
-    self.url = url
-    self.trackName = trackName
-    self.artistName = artistName
-    self.collectionName = collectionName
-    self.infoURL = infoURL
-  }
-
   func toTrackResponse() -> TrackResponse {
     return TrackResponse(
-      id: self.id,
+      id: Int(self.id),
       img: self.img,
       url: self.url,
       trackName: self.trackName,
