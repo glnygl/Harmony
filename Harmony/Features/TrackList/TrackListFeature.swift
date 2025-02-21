@@ -15,6 +15,12 @@ struct TrackListFeature {
 
   private enum CancelID { case debounce }
 
+  @Reducer(state: .equatable)
+  public enum Destination {
+    case details(TrackDetailFeature)
+    case currentlyPlaying(CurrentlyPlayingBarFeature)
+  }
+
   @ObservableState
   struct State: Equatable {
     var searchText: String = ""
@@ -25,17 +31,19 @@ struct TrackListFeature {
     var grammyTrackList: [TrackResponse] = GrammyWinner.tracks
     var popularArtistsState = PopularArtistsFeature.State()
     var popularGenresState = PopularGenreFeature.State()
-    @Presents var trackDetailState: TrackDetailFeature.State?
+    @Presents
+    var destination: Destination.State?
+
   }
 
   enum Action: BindableAction {
     case binding(BindingAction<State>)
+    case destination(PresentationAction<Destination.Action>)
     case listRowSelected(TrackResponse)
     case searchTrackList
     case cancelSearch
     case setTrackListResponse(TaskResult<SearchResponse>)
     case setGenreTrackListResponse(TaskResult<SearchResponse>)
-    case showTrackDetail(PresentationAction<TrackDetailFeature.Action>)
     case popularArtistsAction(PopularArtistsFeature.Action)
     case popularGenresAction(PopularGenreFeature.Action)
   }
@@ -48,15 +56,14 @@ struct TrackListFeature {
 
     Reduce { state, action in
       switch action {
-      case .binding(\.searchText):
-        return .none
+      case .binding:
+          return Effect<TrackListFeature.Action>.none
+        case .destination:
+          return .none
       case .searchTrackList:
         return performSearch(&state)
       case .listRowSelected(let track):
-        state.trackDetailState = TrackDetailFeature.State(track: track)
-        return .none
-      case .showTrackDetail(.presented(.dismissButtonTapped)):
-        state.trackDetailState = nil
+        state.destination = .details(TrackDetailFeature.State(track: track))
         return .none
       case .setTrackListResponse(.success(let response)):
         updateLoadingState(&state, isLoading: false)
@@ -81,12 +88,9 @@ struct TrackListFeature {
         return performSearch(&state)
       case .popularGenresAction(.genreSelected(let genre)):
         return performGenreSearch(&state, genre: genre)
-      default:
-        return .none
       }
     }
-
-    .ifLet(\.$trackDetailState, action: \.showTrackDetail) { TrackDetailFeature() }
+    .ifLet(\.$destination, action: \.destination)
 
   }
 

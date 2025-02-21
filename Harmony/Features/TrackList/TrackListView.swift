@@ -81,7 +81,10 @@ struct TrackListView: View {
       Text(store.error)
     }
     .fullScreenCover(
-      item: $store.scope(state: \.trackDetailState, action: \.showTrackDetail)
+      item: $store.scope(
+        state: \.destination?.details,
+        action: \.destination.details
+      )
     ) { detailStore in
       NavigationStack {
         TrackDetailView(store: detailStore)

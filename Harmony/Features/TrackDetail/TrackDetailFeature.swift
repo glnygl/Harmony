@@ -14,7 +14,8 @@ struct TrackDetailFeature {
   @Dependency(\.openURL) var openURL
   @Dependency(\.musicPlayer) var musicPlayer
   @Dependency(\.favoriteService) var favoriteService
-  
+  @Dependency(\.dismiss) var dismiss
+
   @ObservableState
   struct State: Equatable {
     var track: TrackResponse
@@ -79,7 +80,7 @@ struct TrackDetailFeature {
         return .none
       case .dismissButtonTapped:
         musicPlayer.pause()
-        return .none
+          return .run { _ in await self.dismiss() }
       case .playerControlAction(.playPauseTapped(let shouldPlay)):
         if shouldPlay {
           musicPlayer.play()

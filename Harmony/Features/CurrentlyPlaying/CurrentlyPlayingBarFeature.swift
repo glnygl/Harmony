@@ -12,14 +12,14 @@ import Foundation
 struct CurrentlyPlayingBarFeature {
 
   @ObservableState
-  struct State {
+  struct State: Equatable {
     var trackName: String
     var artistName: String
     var isPlaying: Bool
     var albumArt: String
   }
 
-  enum Action {
+  enum Action: Equatable {
     case playButtonTapped
   }
 
