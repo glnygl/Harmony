@@ -14,22 +14,22 @@ struct TrackControlFeature {
   @ObservableState
   struct State: Equatable {
     var trackId: Int
-    @SharedReader(.fetch(Ids()))
-    private var favoriteTrackIds: [Int64] = []
-    var isFavorite: Bool {
-      favoriteTrackIds.contains(Int64(trackId))
-    }
+    @SharedReader
+    var isFavorite: Bool
     var isMute: Bool = false
     var playStatus: PlayStatus = .once
 
     init(trackId: Int) {
       self.trackId = trackId
+
+      _isFavorite = SharedReader(wrappedValue: false, .fetch(Exists(trackId: Int64(trackId))))
     }
   }
 
-  struct Ids: FetchKeyRequest {
-    func fetch(_ db: GRDB.Database) throws -> [Int64] {
-      try FavoriteTrack.all().fetchAll(db).map(\.id)
+  struct Exists: FetchKeyRequest {
+    let trackId: Int64
+    func fetch(_ db: GRDB.Database) throws -> Bool {
+      try FavoriteTrack.filter(Column("id") == trackId).fetchCount(db) > 0
     }
   }
 
