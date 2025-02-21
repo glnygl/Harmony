@@ -5,11 +5,9 @@
 //  Created by Glny Gl on 13/02/2025.
 //
 
-import Foundation
-import GRDB
-import SharingGRDB
 import Dependencies
-import DependenciesMacros
+import Foundation
+import SharingGRDB
 
 
 struct FavoriteService {
