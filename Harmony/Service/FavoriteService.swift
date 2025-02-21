@@ -22,17 +22,7 @@ actor FavoriteService: FavoriteServiceProtocol {
   init() {}
 
   func addFavorite(item: TrackResponse) async throws {
-
-    let favorite = FavoriteTrack(
-      id: Int64(item.id),
-      img: item.img,
-      url: item.url,
-      trackName: item.trackName,
-      artistName: item.artistName,
-      collectionName: item.collectionName,
-      infoURL: item.infoURL
-    )
-    
+    let favorite = item.toFavoriteTrack()
     try await dbQueue.write { db in
       try favorite.insert(db)
     }
