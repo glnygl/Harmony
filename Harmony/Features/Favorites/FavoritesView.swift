@@ -60,9 +60,6 @@ struct FavoritesView: View {
         .padding(.horizontal)
       }
     }
-    .onAppear {
-      store.send(.fetchFavorites)
-    }
   }
 }
 

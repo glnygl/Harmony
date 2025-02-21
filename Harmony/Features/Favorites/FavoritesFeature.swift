@@ -36,7 +36,6 @@ struct FavoritesFeature {
   }
 
   enum Action {
-    case fetchFavorites
     case listRowSelected(TrackResponse)
     case showTrackDetail(PresentationAction<TrackDetailFeature.Action>)
   }
@@ -49,7 +48,7 @@ struct FavoritesFeature {
         return .none
       case .showTrackDetail(.presented(.dismissButtonTapped)):
         state.trackDetailState = nil
-        return .send(.fetchFavorites)
+        return .none
       default:
         return .none
       }
