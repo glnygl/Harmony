@@ -7,7 +7,6 @@
 
 import Dependencies
 import AVFoundation
-import SwiftData
 
 extension DependencyValues {
 
@@ -46,13 +45,6 @@ private enum MusicPlayerKey: DependencyKey {
 
 private enum FavoriteServiceKey: DependencyKey {
   static var liveValue: FavoriteServiceProtocol {
-    do {
-      let config = ModelConfiguration(for: FavoriteTrack.self)
-      let container = try ModelContainer(for: FavoriteTrack.self, configurations: config)
-      let context = ModelContext(container)
-      return FavoriteService(context: context)
-    } catch {
-      fatalError("Failed to create ModelContainer: \(error)")
-    }
+        return FavoriteService()
   }
 }

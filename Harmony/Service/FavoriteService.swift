@@ -5,63 +5,55 @@
 //  Created by Glny Gl on 13/02/2025.
 //
 
-import SwiftData
 import Foundation
+import GRDB
+import SharingGRDB
 
 protocol FavoriteServiceProtocol: Sendable {
   func addFavorite(item: TrackResponse) async throws
   func deleteFavorite(item: TrackResponse) async throws
   func getFavorites(limit: Int, offset: Int) async throws -> [TrackResponse]
-  func isFavorite(trackID: Int) async -> Bool
 }
 
-final actor FavoriteService: FavoriteServiceProtocol {
-  private let context: ModelContext
-  private var favoriteIDs: Set<Int> = []
+actor FavoriteService: FavoriteServiceProtocol {
+  @Dependency(\.defaultDatabase) var dbQueue
 
-  init(context: ModelContext) {
-    self.context = context
-    Task {
-      await loadFavorites()
-    }
-  }
 
-  func addFavorite(item: TrackResponse) throws {
-    if isFavorite(trackID: item.id) { return }
-    context.insert(item.toFavoriteTrack())
-    try context.save()
-    favoriteIDs.insert(item.id)
-  }
+  init() {}
 
-  func deleteFavorite(item: TrackResponse) throws {
-    let descriptor = FetchDescriptor<FavoriteTrack>(
-      predicate: #Predicate { $0.id == item.id }
+  func addFavorite(item: TrackResponse) async throws {
+
+    let favorite = FavoriteTrack(
+      id: Int64(item.id),
+      img: item.img,
+      url: item.url,
+      trackName: item.trackName,
+      artistName: item.artistName,
+      collectionName: item.collectionName,
+      infoURL: item.infoURL
     )
-    if let favoriteTrack = try context.fetch(descriptor).first {
-      context.delete(favoriteTrack)
-      try context.save()
-      favoriteIDs.remove(item.id)
+    
+    try await dbQueue.write { db in
+      try favorite.insert(db)
     }
   }
 
-  func getFavorites(limit: Int = 20, offset: Int = 0) throws -> [TrackResponse] {
-    var descriptor = FetchDescriptor<FavoriteTrack>()
-    descriptor.fetchLimit = limit
-    descriptor.fetchOffset = offset
-    let favoriteItems = try context.fetch(descriptor)
-    return favoriteItems.map { $0.toTrackResponse() }
-  }
-
-  private func loadFavorites() {
-    var descriptor = FetchDescriptor<FavoriteTrack>()
-    descriptor.propertiesToFetch = [\.id]
-
-    if let items = try? context.fetch(descriptor) {
-      self.favoriteIDs = Set(items.map { $0.id })
+  func deleteFavorite(item: TrackResponse) async throws {
+    try await dbQueue.write { db in
+      _ = try FavoriteTrack
+        .filter(Column("id") == Int64(item.id))
+        .deleteAll(db)
     }
   }
 
-  func isFavorite(trackID: Int) -> Bool {
-    favoriteIDs.contains(trackID)
+  func getFavorites(limit: Int = 20, offset: Int = 0) async throws -> [TrackResponse] {
+    try await dbQueue.read { db in
+      let favorites = try FavoriteTrack
+        .order(Column("id").desc)
+        .limit(limit, offset: offset)
+        .fetchAll(db)
+      
+      return favorites.map { $0.toTrackResponse() }
+    }
   }
 }

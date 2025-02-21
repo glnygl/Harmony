@@ -6,15 +6,31 @@
 //
 
 import ComposableArchitecture
+import SharingGRDB
 
 @Reducer
 struct TrackControlFeature {
 
   @ObservableState
   struct State: Equatable {
-    var isFavorite: Bool = false
+    var trackId: Int
+    @SharedReader(.fetch(Ids()))
+    private var favoriteTrackIds: [Int64] = []
+    var isFavorite: Bool {
+      favoriteTrackIds.contains(Int64(trackId))
+    }
     var isMute: Bool = false
     var playStatus: PlayStatus = .once
+
+    init(trackId: Int) {
+      self.trackId = trackId
+    }
+  }
+
+  struct Ids: FetchKeyRequest {
+    func fetch(_ db: GRDB.Database) throws -> [Int64] {
+      try FavoriteTrack.all().fetchAll(db).map(\.id)
+    }
   }
 
   enum Action {
@@ -27,9 +43,8 @@ struct TrackControlFeature {
   var body: some ReducerOf<Self> {
     Reduce { state, action in
       switch action {
-      case .favoriteButtonTapped(let value):
-        state.isFavorite = value
-        return .none
+      case .favoriteButtonTapped:
+          return .none
       case .setPlayStatus(var status):
         status.next()
         state.playStatus = status

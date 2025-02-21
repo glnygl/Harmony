@@ -2,7 +2,7 @@
 //  Database.swift
 //  Harmony
 //
-//  Created by Ibrahim Kteish on 21/2/25.
+//  Created by Ibrahim Koteish on 21/2/25.
 //
 
 import Foundation

@@ -6,18 +6,23 @@
 //
 
 import SwiftUI
-import SwiftData
 import ComposableArchitecture
+import SharingGRDB
 
 @main
 struct HarmonyApp: App {
 
-  let store = Store(initialState: AppFeature.State()) { AppFeature() }
+  static let store = Store(initialState: AppFeature.State()) { AppFeature() }
+
+  init() {
+    prepareDependencies {
+      $0.defaultDatabase = .appDatabase
+    }
+  }
 
   var body: some Scene {
     WindowGroup {
-      AppView(store: store)
-        .modelContainer(for: [FavoriteTrack.self])
+      AppView(store: Self.store)
     }
   }
 }

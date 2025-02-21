@@ -107,7 +107,6 @@ struct TrackDetailView: View {
     .padding()
     .background(Color.white.ignoresSafeArea())
     .onAppear {
-      store.send(.checkIsFavorite)
       store.send(.setMusicURL(store.track.url ?? ""))
     }
     .onReceive(Timer.publish(every: 1, on: .main, in: .default).autoconnect()) { _ in

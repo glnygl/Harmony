@@ -18,14 +18,19 @@ struct TrackDetailFeature {
   @ObservableState
   struct State: Equatable {
     var track: TrackResponse
-    var musicURL: String?
+    var musicURL: String? = nil
     var isLoading: Bool = true
     var showPopover: Bool = false
     var currentTime: Double = 0
     var totalDuration: Double = 0
     var playerControlState = PlayerControlFeature.State()
-    var trackControlState = TrackControlFeature.State()
+    var trackControlState: TrackControlFeature.State
     var volumeControlState = VolumeControlFeature.State()
+
+    init(track: TrackResponse) {
+      self.track = track
+      self.trackControlState = .init(trackId: track.id)
+    }
   }
   
   enum Action: BindableAction {
@@ -36,10 +41,6 @@ struct TrackDetailFeature {
     case setInitialTime(Double, Double)
     case openURLResponse(TaskResult<Bool>)
     case dismissButtonTapped
-    case addFavorite(TrackResponse)
-    case deleteFavorite(TrackResponse)
-    case checkIsFavorite
-    case checkIsFavoriteResponse(Bool)
     case playerControlAction(PlayerControlFeature.Action)
     case trackControlAction(TrackControlFeature.Action)
     case volumeControlAction(VolumeControlFeature.Action)
@@ -71,18 +72,6 @@ struct TrackDetailFeature {
         return .none
       case let .updateTime(time):
         return setCurrentTime(&state, time: time)
-      case .addFavorite(let track):
-        return addFavorite(&state, track: track)
-      case .deleteFavorite(let track):
-        return deleteFavorite(&state, track: track)
-      case .checkIsFavorite:
-        let trackId = state.track.id
-        return .run { send in
-          await send(.checkIsFavoriteResponse(favoriteService.isFavorite(trackID: trackId)))
-        }
-      case .checkIsFavoriteResponse(let isFavorite):
-        state.trackControlState.isFavorite = isFavorite
-        return .none
       case .openURLResponse(.success(_)):
         musicPlayer.pause()
         return .send(.playerControlAction(.playPauseTapped(false)))
@@ -106,22 +95,30 @@ struct TrackDetailFeature {
         return .none
       case .trackControlAction(.setPlayStatus(_)):
         return .none
-      case .trackControlAction(.favoriteButtonTapped(let isFavorite)):
-        if isFavorite {
-          return .send(.addFavorite(state.track))
-        } else {
-          return .send(.deleteFavorite(state.track))
-        }
+        case let .trackControlAction(.favoriteButtonTapped(isFavorite)):
+          let track = state.track
+          return .run { _ in
+            if isFavorite {
+              try await self.favoriteService.addFavorite(item: track)
+            } else {
+              try await self.favoriteService.deleteFavorite(item: track)
+            }
+          } catch: { _, error in
+            // Handle later on
+            print(error)
+          }
       case .trackControlAction(.infoButtonTapped):
         return redirectURL(&state)
       case .trackControlAction(.muteVolume(let value)):
         return setMuteState(&state, isMute: value)
+
       case .volumeControlAction(.updateVolume(let volume)):
         musicPlayer.setVolume(volume)
         state.trackControlState.isMute = (volume == 0)
         return .none
       }
     }
+
   }
   
   private func setMusicURL(_ state: inout State, url: String) -> Effect<Action> {
@@ -150,26 +147,6 @@ struct TrackDetailFeature {
       }
     }
     return .none
-  }
-  
-  private func addFavorite(_ state: inout State, track: TrackResponse) -> Effect<Action> {
-    return .run { send in
-      do {
-        try await favoriteService.addFavorite(item: track)
-      } catch {
-        print(error)
-      }
-    }
-  }
-  
-  private func deleteFavorite(_ state: inout State, track: TrackResponse) -> Effect<Action> {
-    return .run { send in
-      do {
-        try await favoriteService.deleteFavorite(item: track)
-      } catch {
-        print(error)
-      }
-    }
   }
   
   private func setForwardState(_ state: inout State, isRewind: Bool) {
