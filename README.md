@@ -23,11 +23,11 @@
 ## Keywords 
 - Swift
 - SwiftUI
-- SwiftData
+- SharingGRDB (previously SwiftData)
 
 ## Roadmap
 
-- SharingGRDB
+- SharingGRDB ✅
 - Currently Playing 
 - Switch Between Songs
 - Pagination
