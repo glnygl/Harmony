@@ -8,7 +8,7 @@
 import GRDB
 
 struct FavoriteTrack: Codable, FetchableRecord, PersistableRecord, Sendable {
-  static let databaseTableName = "favoriteTracks" // Define table name
+  static let databaseTableName = "favorites" // Define table name
 
   var id: Int64
   var img: String?
