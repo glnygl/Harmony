@@ -18,9 +18,6 @@ protocol FavoriteServiceProtocol: Sendable {
 actor FavoriteService: FavoriteServiceProtocol {
   @Dependency(\.defaultDatabase) var dbQueue
 
-
-  init() {}
-
   func addFavorite(item: TrackResponse) async throws {
     let favorite = item.toFavoriteTrack()
     try await dbQueue.write { db in
