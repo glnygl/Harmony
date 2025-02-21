@@ -55,7 +55,7 @@ struct CurrentlyPlayingBarView: View {
         }
         .padding(.horizontal, 4)
         .padding(.vertical, 4)
-        .background(Color(red: 0.4, green: 0.2, blue: 0.0).opacity(0.8))
+        .background(Color(red: 0.4, green: 0.2, blue: 0.0))
         .cornerRadius(8)
         .shadow(radius: 2)
         .padding(.horizontal, 4)
