@@ -56,9 +56,7 @@ struct TrackDetailFeature {
     
     Reduce { state, action in
       switch action {
-      case .binding(\.showPopover):
-        return .none
-      case .binding(_):
+      case .binding:
         return .none
       case .setMusicURL(let url):
         return setMusicURL(&state, url: url)
@@ -79,7 +77,6 @@ struct TrackDetailFeature {
       case .openURLResponse(.failure(_)):
         return .none
       case .dismissButtonTapped:
-        musicPlayer.pause()
           return .run { _ in await self.dismiss() }
       case .playerControlAction(.playPauseTapped(let shouldPlay)):
         if shouldPlay {

@@ -11,6 +11,8 @@ import Foundation
 @Reducer
 struct CurrentlyPlayingBarFeature {
 
+  @Dependency(\.musicPlayer) var musicPlayer
+
   @ObservableState
   struct State: Equatable {
     var trackName: String
@@ -25,12 +27,16 @@ struct CurrentlyPlayingBarFeature {
 
   var body: some ReducerOf<Self> {
     Reduce { state, action in
-
       switch action {
         case .playButtonTapped:
-          return .none
+          let isPlaying = state.isPlaying
+          state.isPlaying.toggle()
+          return .run { _ in
+            isPlaying ? self.musicPlayer.pause() : self.musicPlayer.play()
+          }
       }
     }
   }
-
 }
+
+

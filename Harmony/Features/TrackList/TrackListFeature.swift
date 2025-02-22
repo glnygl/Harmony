@@ -18,7 +18,6 @@ struct TrackListFeature {
   @Reducer(state: .equatable)
   public enum Destination {
     case details(TrackDetailFeature)
-    case currentlyPlaying(CurrentlyPlayingBarFeature)
   }
 
   @ObservableState
@@ -57,8 +56,8 @@ struct TrackListFeature {
     Reduce { state, action in
       switch action {
       case .binding:
-          return Effect<TrackListFeature.Action>.none
-        case .destination:
+          return .none
+      case .destination:
           return .none
       case .searchTrackList:
         return performSearch(&state)
@@ -93,6 +92,7 @@ struct TrackListFeature {
     .ifLet(\.$destination, action: \.destination)
 
   }
+
 
   private func performSearch(_ state: inout State) -> Effect<Action> {
     guard !state.searchText.isEmpty else {

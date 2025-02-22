@@ -8,58 +8,72 @@
 
 import ComposableArchitecture
 import SwiftUI
+import NukeUI
 
 struct CurrentlyPlayingBarView: View {
 
   @Bindable var store: StoreOf<CurrentlyPlayingBarFeature>
+  @State private var averageColor: Color = .white
 
   init(store: StoreOf<CurrentlyPlayingBarFeature>) {
     self.store = store
   }
 
-    var body: some View {
-        HStack(spacing: 16) {
-            // Album Artwork
-          Image(store.albumArt)
-                .resizable()
-                .scaledToFill()
-                .frame(width: 48, height: 48)
-                .cornerRadius(4)
-            
-            // Track info
-            VStack(alignment: .leading, spacing: 2) {
-              Text(store.trackName)
-                    .font(.headline)
-                    .foregroundColor(.white)
-                    .lineLimit(1)
-              Text(store.artistName)
-                    .font(.subheadline)
-                    .foregroundColor(.white.opacity(0.8))
-                    .lineLimit(1)
+  var body: some View {
+    HStack(spacing: 16) {
+      // Album Artwork
+      LazyImage(url: URL(string: store.albumArt)) { state in
+        if let image = state.image {
+          image
+            .resizable()
+            .scaledToFill()
+            .frame(width: 48, height: 48)
+            .cornerRadius(4)
+            .onAppear {
+              if let uiColor = state.imageContainer?.image.averageColor {
+                averageColor = Color(uiColor)
+              }
             }
-            
-            Spacer()
-            
-            Image(systemName: "hifispeaker.fill")
-                .font(.title2)
-                .foregroundColor(.white)
-            
-            Button(action: {
-              store.send(.playButtonTapped)
-            }) {
-              Image(systemName: store.isPlaying ? "pause.fill" : "play.fill")
-                    .font(.title2)
-                    .foregroundColor(.white)
-                    .padding(.leading, 8)
-            }
+        } else {
+          Rectangle()
+            .fill(.black)
+            .frame(width: 48, height: 48)
         }
-        .padding(.horizontal, 4)
-        .padding(.vertical, 4)
-        .background(Color(red: 0.4, green: 0.2, blue: 0.0))
-        .cornerRadius(8)
-        .shadow(radius: 2)
-        .padding(.horizontal, 4)
+      }
+      // Track info
+      VStack(alignment: .leading, spacing: 2) {
+        Text(store.trackName)
+          .font(.headline)
+          .foregroundColor(.white)
+          .lineLimit(1)
+        Text(store.artistName)
+          .font(.subheadline)
+          .foregroundColor(.white.opacity(0.8))
+          .lineLimit(1)
+      }
+      
+      Spacer()
+      
+      Image(systemName: "hifispeaker.fill")
+        .font(.title2)
+        .foregroundColor(.white)
+      
+      Button(action: {
+        store.send(.playButtonTapped)
+      }) {
+        Image(systemName: store.isPlaying ? "pause.fill" : "play.fill")
+          .font(.title2)
+          .foregroundColor(.white)
+          .padding(.leading, 8)
+      }
     }
+    .padding(.horizontal, 4)
+    .padding(.vertical, 4)
+    .background(averageColor)
+    .cornerRadius(8)
+    .shadow(radius: 2)
+    .padding(.horizontal, 4)
+  }
 }
 
 
@@ -70,9 +84,10 @@ struct CurrentlyPlayingBarView: View {
         trackName: "Revolution",
         artistName: "Måns Zelmerlöw",
         isPlaying: true,
-        albumArt: "H"
+        albumArt: ""
       ),
       reducer: { CurrentlyPlayingBarFeature() }
     )
   )
 }
+
