@@ -1,5 +1,5 @@
 //
-//  CurrentlyPlayingBarFeature.swift
+//  CurrentlyPlayingFeature.swift
 //  Harmony
 //
 //  Created by Ibrahim Kteish on 21/2/25.
@@ -9,7 +9,7 @@ import ComposableArchitecture
 import Foundation
 
 @Reducer
-struct CurrentlyPlayingBarFeature {
+struct CurrentlyPlayingFeature {
 
   @Dependency(\.musicPlayer) var musicPlayer
 

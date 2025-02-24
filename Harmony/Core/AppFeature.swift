@@ -20,7 +20,7 @@ struct AppFeature {
     var selectedTab: SelectedTab = .list
     var listState = TrackListFeature.State()
     var favoritesState = FavoritesFeature.State()
-    var currentlyPlaying: CurrentlyPlayingBarFeature.State?
+    var currentlyPlaying: CurrentlyPlayingFeature.State?
 
     var trackDetailFeature:  TrackDetailFeature.State? {
       self.listState.destination?.details ?? self.favoritesState.trackDetailState
@@ -31,7 +31,7 @@ struct AppFeature {
     case selectTab(SelectedTab)
     case listAction(TrackListFeature.Action)
     case favoritesAction(FavoritesFeature.Action)
-    case currentlyPlaying(CurrentlyPlayingBarFeature.Action)
+    case currentlyPlaying(CurrentlyPlayingFeature.Action)
   }
 
   var body: some ReducerOf<Self> {
@@ -76,7 +76,7 @@ struct AppFeature {
 
     }
     .ifLet(\.currentlyPlaying, action: \.currentlyPlaying) {
-      CurrentlyPlayingBarFeature()
+      CurrentlyPlayingFeature()
     }
   }
 
@@ -84,7 +84,7 @@ struct AppFeature {
     guard let trackDetailFeature = state.trackDetailFeature else { return .none }
     let track = trackDetailFeature.track
     let isPlaying = trackDetailFeature.playerControlState.isPlaying
-    state.currentlyPlaying = CurrentlyPlayingBarFeature.State(
+    state.currentlyPlaying = CurrentlyPlayingFeature.State(
       trackResponse: track,
       isPlaying: isPlaying
     )

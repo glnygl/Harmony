@@ -10,14 +10,10 @@ import ComposableArchitecture
 import SwiftUI
 import NukeUI
 
-struct CurrentlyPlayingBarView: View {
+struct CurrentlyPlayingView: View {
 
-  @Bindable var store: StoreOf<CurrentlyPlayingBarFeature>
+  @Bindable var store: StoreOf<CurrentlyPlayingFeature>
   @State private var averageColor: Color = .white
-
-  init(store: StoreOf<CurrentlyPlayingBarFeature>) {
-    self.store = store
-  }
 
   var body: some View {
     HStack(spacing: 16) {
@@ -76,9 +72,9 @@ struct CurrentlyPlayingBarView: View {
 
 
 #Preview(traits: .sizeThatFitsLayout) {
-  CurrentlyPlayingBarView(
+  CurrentlyPlayingView(
     store: .init(
-      initialState: CurrentlyPlayingBarFeature.State.init(
+      initialState: CurrentlyPlayingFeature.State.init(
         trackResponse: .init(
           id: 1,
           img: "img",
@@ -90,7 +86,7 @@ struct CurrentlyPlayingBarView: View {
         ),
         isPlaying: true
       ),
-      reducer: { CurrentlyPlayingBarFeature()
+      reducer: { CurrentlyPlayingFeature()
       }
     )
   )

@@ -29,7 +29,7 @@ struct AppView: View {
           state: \.currentlyPlaying,
           action: \.currentlyPlaying
         ) {
-          CurrentlyPlayingBarView(store: store)
+          CurrentlyPlayingView(store: store)
             .padding(.bottom, 55)
         }
       }
