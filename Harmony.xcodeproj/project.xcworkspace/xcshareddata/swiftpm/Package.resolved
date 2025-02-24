@@ -1,5 +1,5 @@
 {
-  "originHash" : "c090f2ff87321ca81a8a988b1d796eee0720a88eccd25d0f07306500ab33fc12",
+  "originHash" : "3fc30006a9f3be7c3fa602823b4e712ccbe5ace61d4c61ca1feeeaca3abf2bc2",
   "pins" : [
     {
       "identity" : "combine-schedulers",
@@ -15,14 +15,14 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/groue/GRDB.swift",
       "state" : {
-        "revision" : "c7205b172f38439e7ee62c208d1d76fa353c0a81",
-        "version" : "7.2.0"
+        "revision" : "6eba24d16952452a8a54f6a639491f3c8215527f",
+        "version" : "7.3.0"
       }
     },
     {
       "identity" : "nuke",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/kean/Nuke",
+      "location" : "https://github.com/kean/Nuke.git",
       "state" : {
         "revision" : "0ead44350d2737db384908569c012fe67c421e4d",
         "version" : "12.8.0"
@@ -67,7 +67,7 @@
     {
       "identity" : "swift-composable-architecture",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/pointfreeco/swift-composable-architecture",
+      "location" : "https://github.com/pointfreeco/swift-composable-architecture.git",
       "state" : {
         "revision" : "2ebda6ae2b155a5c3d75aff5f6d25c024bc91311",
         "version" : "1.17.1"

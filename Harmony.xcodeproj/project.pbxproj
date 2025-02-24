@@ -7,10 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		954AC0692D67ECD40000D7C9 /* SharingGRDB in Frameworks */ = {isa = PBXBuildFile; productRef = 954AC0682D67ECD40000D7C9 /* SharingGRDB */; };
-		954AC06C2D67ECE50000D7C9 /* ComposableArchitecture in Frameworks */ = {isa = PBXBuildFile; productRef = 954AC06B2D67ECE50000D7C9 /* ComposableArchitecture */; };
-		954AC06F2D67ED0C0000D7C9 /* Nuke in Frameworks */ = {isa = PBXBuildFile; productRef = 954AC06E2D67ED0C0000D7C9 /* Nuke */; };
-		954AC0712D67ED0C0000D7C9 /* NukeUI in Frameworks */ = {isa = PBXBuildFile; productRef = 954AC0702D67ED0C0000D7C9 /* NukeUI */; };
+		29428B022D56B2DB006E8D5C /* ComposableArchitecture in Frameworks */ = {isa = PBXBuildFile; productRef = 29428B012D56B2DB006E8D5C /* ComposableArchitecture */; };
+		29428FFA2D58EAC7006E8D5C /* Nuke in Frameworks */ = {isa = PBXBuildFile; productRef = 29428FF92D58EAC7006E8D5C /* Nuke */; };
+		294290672D58EB02006E8D5C /* NukeUI in Frameworks */ = {isa = PBXBuildFile; productRef = 294290662D58EB02006E8D5C /* NukeUI */; };
+		297FED0C2D6CC432003C3FD1 /* SharingGRDB in Frameworks */ = {isa = PBXBuildFile; productRef = 297FED0B2D6CC432003C3FD1 /* SharingGRDB */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -59,10 +59,10 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				954AC06F2D67ED0C0000D7C9 /* Nuke in Frameworks */,
-				954AC06C2D67ECE50000D7C9 /* ComposableArchitecture in Frameworks */,
-				954AC0692D67ECD40000D7C9 /* SharingGRDB in Frameworks */,
-				954AC0712D67ED0C0000D7C9 /* NukeUI in Frameworks */,
+				294290672D58EB02006E8D5C /* NukeUI in Frameworks */,
+				29428B022D56B2DB006E8D5C /* ComposableArchitecture in Frameworks */,
+				297FED0C2D6CC432003C3FD1 /* SharingGRDB in Frameworks */,
+				29428FFA2D58EAC7006E8D5C /* Nuke in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -131,10 +131,10 @@
 			);
 			name = Harmony;
 			packageProductDependencies = (
-				954AC0682D67ECD40000D7C9 /* SharingGRDB */,
-				954AC06B2D67ECE50000D7C9 /* ComposableArchitecture */,
-				954AC06E2D67ED0C0000D7C9 /* Nuke */,
-				954AC0702D67ED0C0000D7C9 /* NukeUI */,
+				29428B012D56B2DB006E8D5C /* ComposableArchitecture */,
+				29428FF92D58EAC7006E8D5C /* Nuke */,
+				294290662D58EB02006E8D5C /* NukeUI */,
+				297FED0B2D6CC432003C3FD1 /* SharingGRDB */,
 			);
 			productName = Harmony;
 			productReference = 29428AC02D56B00B006E8D5C /* Harmony.app */;
@@ -220,9 +220,9 @@
 			mainGroup = 29428AB72D56B00B006E8D5C;
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
-				954AC0672D67ECD40000D7C9 /* XCRemoteSwiftPackageReference "sharing-grdb" */,
-				954AC06A2D67ECE50000D7C9 /* XCRemoteSwiftPackageReference "swift-composable-architecture" */,
-				954AC06D2D67ED0C0000D7C9 /* XCRemoteSwiftPackageReference "Nuke" */,
+				29428AFC2D56B21B006E8D5C /* XCRemoteSwiftPackageReference "swift-composable-architecture" */,
+				29428FF82D58EAC7006E8D5C /* XCRemoteSwiftPackageReference "Nuke" */,
+				297FED0A2D6CC432003C3FD1 /* XCRemoteSwiftPackageReference "sharing-grdb" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 29428AC12D56B00B006E8D5C /* Products */;
@@ -591,7 +591,23 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		954AC0672D67ECD40000D7C9 /* XCRemoteSwiftPackageReference "sharing-grdb" */ = {
+		29428AFC2D56B21B006E8D5C /* XCRemoteSwiftPackageReference "swift-composable-architecture" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/pointfreeco/swift-composable-architecture.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.17.1;
+			};
+		};
+		29428FF82D58EAC7006E8D5C /* XCRemoteSwiftPackageReference "Nuke" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/kean/Nuke.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 12.8.0;
+			};
+		};
+		297FED0A2D6CC432003C3FD1 /* XCRemoteSwiftPackageReference "sharing-grdb" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/pointfreeco/sharing-grdb";
 			requirement = {
@@ -599,44 +615,28 @@
 				minimumVersion = 0.1.0;
 			};
 		};
-		954AC06A2D67ECE50000D7C9 /* XCRemoteSwiftPackageReference "swift-composable-architecture" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/pointfreeco/swift-composable-architecture";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 1.17.1;
-			};
-		};
-		954AC06D2D67ED0C0000D7C9 /* XCRemoteSwiftPackageReference "Nuke" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/kean/Nuke";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 12.8.0;
-			};
-		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		954AC0682D67ECD40000D7C9 /* SharingGRDB */ = {
+		29428B012D56B2DB006E8D5C /* ComposableArchitecture */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 954AC0672D67ECD40000D7C9 /* XCRemoteSwiftPackageReference "sharing-grdb" */;
-			productName = SharingGRDB;
-		};
-		954AC06B2D67ECE50000D7C9 /* ComposableArchitecture */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 954AC06A2D67ECE50000D7C9 /* XCRemoteSwiftPackageReference "swift-composable-architecture" */;
+			package = 29428AFC2D56B21B006E8D5C /* XCRemoteSwiftPackageReference "swift-composable-architecture" */;
 			productName = ComposableArchitecture;
 		};
-		954AC06E2D67ED0C0000D7C9 /* Nuke */ = {
+		29428FF92D58EAC7006E8D5C /* Nuke */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 954AC06D2D67ED0C0000D7C9 /* XCRemoteSwiftPackageReference "Nuke" */;
+			package = 29428FF82D58EAC7006E8D5C /* XCRemoteSwiftPackageReference "Nuke" */;
 			productName = Nuke;
 		};
-		954AC0702D67ED0C0000D7C9 /* NukeUI */ = {
+		294290662D58EB02006E8D5C /* NukeUI */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 954AC06D2D67ED0C0000D7C9 /* XCRemoteSwiftPackageReference "Nuke" */;
+			package = 29428FF82D58EAC7006E8D5C /* XCRemoteSwiftPackageReference "Nuke" */;
 			productName = NukeUI;
+		};
+		297FED0B2D6CC432003C3FD1 /* SharingGRDB */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 297FED0A2D6CC432003C3FD1 /* XCRemoteSwiftPackageReference "sharing-grdb" */;
+			productName = SharingGRDB;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
