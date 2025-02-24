@@ -81,6 +81,7 @@ struct TrackDetailFeature {
           return .run { _ in await self.dismiss() }
       case .playerControlAction(.playPauseTapped(let shouldPlay)):
         if shouldPlay {
+          musicPlayer.seek(state.currentTime)
           musicPlayer.play()
         } else {
           musicPlayer.pause()
@@ -127,7 +128,6 @@ struct TrackDetailFeature {
         var current = self.musicPlayer.currentTime()
         current = self.musicPlayer.state().currentURL  == url ? current : 0
         let duration = try await musicPlayer.setURL(url)
-
         await send(.setInitialTime(current, duration, self.musicPlayer.state().isPlaying))
       } catch {
         print(error)
