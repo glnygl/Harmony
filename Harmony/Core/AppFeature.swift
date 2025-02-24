@@ -86,14 +86,10 @@ struct AppFeature {
     guard let trackDetailFeature = state.trackDetailFeature else { return .none }
         let track = trackDetailFeature.track
         let isPlaying = trackDetailFeature.playerControlState.isPlaying
-        if isPlaying {
           state.currentlyPlaying = CurrentlyPlayingBarFeature.State(
             trackResponse: track,
-              isPlaying: true
+              isPlaying: isPlaying
           )
-        } else {
-          state.currentlyPlaying = nil
-        }
         return .none
   }
 }
