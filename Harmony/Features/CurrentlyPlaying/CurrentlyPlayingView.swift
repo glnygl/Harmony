@@ -67,6 +67,11 @@ struct CurrentlyPlayingView: View {
     .onTapGesture {
       self.store.send(.viewTapped)
     }
+    .onReceive(Timer.publish(every: 1, on: .main, in: .default).autoconnect()) { _ in
+      if store.isPlaying {
+        store.send(.updateTime)
+      }
+    }
   }
 }
 

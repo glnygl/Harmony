@@ -23,6 +23,8 @@ struct CurrentlyPlayingFeature {
     case delegate(Delegate)
     case playButtonTapped
     case viewTapped
+    case updateTime
+    case seek(Double)
 
     enum Delegate: Equatable {
       case tapped(TrackResponse)
@@ -42,6 +44,19 @@ struct CurrentlyPlayingFeature {
           }
         case .viewTapped:
           return .send(.delegate(.tapped(state.trackResponse)))
+      case .updateTime:
+        let currentTime = musicPlayer.currentTime()
+        let duration = musicPlayer.duration()
+        if currentTime >= duration {
+          return .run { send in
+            await send(.seek(0))
+            await send(.playButtonTapped)
+          }
+        }
+        return .none
+      case .seek(let time):
+        musicPlayer.seek(time)
+        return .none
       }
     }
   }

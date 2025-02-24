@@ -26,8 +26,8 @@ struct AppView: View {
       }
       .overlay(alignment: .bottom) {
         if let store = store.scope(
-          state: \.currentlyPlaying,
-          action: \.currentlyPlaying
+          state: \.currentlyPlayingState,
+          action: \.currentlyPlayingAction
         ) {
           CurrentlyPlayingView(store: store)
             .padding(.bottom, 55)

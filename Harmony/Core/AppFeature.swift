@@ -20,7 +20,7 @@ struct AppFeature {
     var selectedTab: SelectedTab = .list
     var listState = TrackListFeature.State()
     var favoritesState = FavoritesFeature.State()
-    var currentlyPlaying: CurrentlyPlayingFeature.State?
+    var currentlyPlayingState: CurrentlyPlayingFeature.State?
 
     var trackDetailFeature:  TrackDetailFeature.State? {
       self.listState.destination?.details ?? self.favoritesState.trackDetailState
@@ -31,7 +31,7 @@ struct AppFeature {
     case selectTab(SelectedTab)
     case listAction(TrackListFeature.Action)
     case favoritesAction(FavoritesFeature.Action)
-    case currentlyPlaying(CurrentlyPlayingFeature.Action)
+    case currentlyPlayingAction(CurrentlyPlayingFeature.Action)
   }
 
   var body: some ReducerOf<Self> {
@@ -49,7 +49,7 @@ struct AppFeature {
               state.favoritesState.isCurrentlyPlaying = true
               return handleTrackDetailsDismissing(&state)
             case .listRowSelected:
-              state.currentlyPlaying = nil
+             state.currentlyPlayingState = nil
               state.listState.isCurrentlyPlaying = false
               state.favoritesState.isCurrentlyPlaying = false
               return .none
@@ -61,11 +61,11 @@ struct AppFeature {
           state.favoritesState.isCurrentlyPlaying = true
           return handleTrackDetailsDismissing(&state)
         case .favoritesAction(.listRowSelected):
-          state.currentlyPlaying = nil
+          state.currentlyPlayingState = nil
           state.listState.isCurrentlyPlaying = false
           state.favoritesState.isCurrentlyPlaying = false
           return .none
-        case let .currentlyPlaying(.delegate(delegateAction)):
+        case let .currentlyPlayingAction(.delegate(delegateAction)):
           switch delegateAction {
             case let .tapped(trackResponse):
               return .send(.listAction(.listRowSelected(trackResponse)))
@@ -75,7 +75,7 @@ struct AppFeature {
       }
 
     }
-    .ifLet(\.currentlyPlaying, action: \.currentlyPlaying) {
+    .ifLet(\.currentlyPlayingState, action: \.currentlyPlayingAction) {
       CurrentlyPlayingFeature()
     }
   }
@@ -84,7 +84,7 @@ struct AppFeature {
     guard let trackDetailFeature = state.trackDetailFeature else { return .none }
     let track = trackDetailFeature.track
     let isPlaying = trackDetailFeature.playerControlState.isPlaying
-    state.currentlyPlaying = CurrentlyPlayingFeature.State(
+      state.currentlyPlayingState = CurrentlyPlayingFeature.State(
       trackResponse: track,
       isPlaying: isPlaying
     )
