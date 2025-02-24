@@ -34,46 +34,36 @@ struct AppFeature {
     case currentlyPlaying(CurrentlyPlayingBarFeature.Action)
   }
 
-  private func details(_ state: inout State, action: Action) -> Effect<Action> {
-    switch action {
-      case let .listAction(trackList):
-        switch trackList {
-          case .destination(.presented(.details(.dismissButtonTapped))):
-            return handleTrackDetailsDismissing(&state)
-          case .listRowSelected:
-            state.currentlyPlaying = nil
-            return .none
-          default:
-            return .none
-        }
-      case .favoritesAction(.showTrackDetail(.presented(.dismissButtonTapped))):
-        return handleTrackDetailsDismissing(&state)
-      case .favoritesAction(.listRowSelected):
-        state.currentlyPlaying = nil
-        return .none
-      default:
-        return .none
-    }
-  }
-
   var body: some ReducerOf<Self> {
 
-    CombineReducers {
-      Reduce(self.details)
+    Scope(state: \.listState, action: \.listAction) { TrackListFeature() }
+    Scope(state: \.favoritesState, action: \.favoritesAction) { FavoritesFeature() }
 
-      Scope(state: \.listState, action: \.listAction) { TrackListFeature() }
-      Scope(state: \.favoritesState, action: \.favoritesAction) { FavoritesFeature() }
+    Reduce { state, action in
 
-      Reduce { state, action in
-        switch action {
-          case let .currentlyPlaying(.delegate(delegateAction)):
-            switch delegateAction {
-              case let .tapped(trackResponse):
-                return .send(.listAction(.listRowSelectedFromPlaying(trackResponse)))
-            }
-          default:
-            return .none
-        }
+      switch action {
+        case let .listAction(trackList):
+          switch trackList {
+            case .destination(.presented(.details(.dismissButtonTapped))):
+              return handleTrackDetailsDismissing(&state)
+            case .listRowSelected:
+              state.currentlyPlaying = nil
+              return .none
+            default:
+              return .none
+          }
+        case .favoritesAction(.showTrackDetail(.presented(.dismissButtonTapped))):
+          return handleTrackDetailsDismissing(&state)
+        case .favoritesAction(.listRowSelected):
+          state.currentlyPlaying = nil
+          return .none
+        case let .currentlyPlaying(.delegate(delegateAction)):
+          switch delegateAction {
+            case let .tapped(trackResponse):
+              return .send(.listAction(.listRowSelectedFromPlaying(trackResponse)))
+          }
+        default:
+          return .none
       }
 
     }
