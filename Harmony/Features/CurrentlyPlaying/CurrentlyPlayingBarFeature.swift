@@ -17,16 +17,6 @@ struct CurrentlyPlayingBarFeature {
   struct State: Equatable {
     var trackResponse: TrackResponse
     var isPlaying: Bool
-
-    var trackName: String {
-      self.trackResponse.trackName!
-    }
-    var artistName: String {
-      self.trackResponse.artistName!
-    }
-    var albumArt: String {
-      self.trackResponse.img!
-    }
   }
 
   enum Action: Equatable {

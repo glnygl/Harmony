@@ -21,7 +21,7 @@ struct CurrentlyPlayingBarView: View {
 
   var body: some View {
     HStack(spacing: 16) {
-      LazyImage(url: URL(string: store.albumArt)) { state in
+      LazyImage(url: URL(string: store.trackResponse.img ?? "")) { state in
         if let image = state.image {
           image
             .resizable()
@@ -35,16 +35,16 @@ struct CurrentlyPlayingBarView: View {
             }
         } else {
           Rectangle()
-            .fill(.black)
+            .fill(.gray.opacity(0.2))
             .frame(width: 48, height: 48)
         }
       }
       VStack(alignment: .leading, spacing: 2) {
-        Text(store.trackName)
+        Text(store.trackResponse.trackName ?? "")
           .font(.headline)
           .foregroundColor(.white)
           .lineLimit(1)
-        Text(store.artistName)
+        Text(store.trackResponse.artistName ?? "")
           .font(.subheadline)
           .foregroundColor(.white.opacity(0.8))
           .lineLimit(1)
