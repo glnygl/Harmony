@@ -43,7 +43,7 @@ struct TrackListView: View {
               .padding(.top, -16)
             }
             .padding(.top, 4)
-            .padding(.bottom, 10)
+            .padding(.bottom, store.isCurrentlyPlaying ? 60 : 10)
           }
           .scrollIndicators(.hidden)
         } else {
@@ -62,6 +62,7 @@ struct TrackListView: View {
           }
           .scrollIndicators(.hidden)
           .padding(.horizontal)
+          .padding(.bottom, store.isCurrentlyPlaying ? 60 : 10)
         }
       }
       .searchable(text: $store.searchText, prompt: "What do you want to listen to?")

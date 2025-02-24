@@ -45,17 +45,25 @@ struct AppFeature {
         case let .listAction(trackList):
           switch trackList {
             case .destination(.presented(.details(.dismissButtonTapped))):
+              state.listState.isCurrentlyPlaying = true
+              state.favoritesState.isCurrentlyPlaying = true
               return handleTrackDetailsDismissing(&state)
             case .listRowSelected:
               state.currentlyPlaying = nil
+              state.listState.isCurrentlyPlaying = false
+              state.favoritesState.isCurrentlyPlaying = false
               return .none
             default:
               return .none
           }
         case .favoritesAction(.showTrackDetail(.presented(.dismissButtonTapped))):
+          state.listState.isCurrentlyPlaying = true
+          state.favoritesState.isCurrentlyPlaying = true
           return handleTrackDetailsDismissing(&state)
         case .favoritesAction(.listRowSelected):
           state.currentlyPlaying = nil
+          state.listState.isCurrentlyPlaying = false
+          state.favoritesState.isCurrentlyPlaying = false
           return .none
         case let .currentlyPlaying(.delegate(delegateAction)):
           switch delegateAction {

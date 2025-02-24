@@ -26,6 +26,7 @@ struct TrackListFeature {
     var selectedGenre: MusicGenre? = nil
     var isLoading: Bool = false
     var error: String = ""
+    var isCurrentlyPlaying = false
     var trackList: [TrackResponse] = []
     var grammyTrackList: [TrackResponse] = GrammyWinner.tracks
     var popularArtistsState = PopularArtistsFeature.State()

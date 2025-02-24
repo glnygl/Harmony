@@ -18,6 +18,7 @@ struct FavoritesFeature {
     @SharedReader(.fetch(TrackList(limit: 10, offset: 0), animation: .default))
     var trackList: [TrackResponse] =  []
     var error: String = ""
+    var isCurrentlyPlaying = false
     @Presents var trackDetailState: TrackDetailFeature.State?
   }
 

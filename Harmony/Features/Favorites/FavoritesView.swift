@@ -46,7 +46,6 @@ struct FavoritesView: View {
               }
             }
           }
-          .scrollIndicators(.hidden)
           .fullScreenCover(
             item: $store.scope(state: \.trackDetailState, action: \.showTrackDetail)
           ) { detailStore in
@@ -57,6 +56,8 @@ struct FavoritesView: View {
           .navigationTitle("Favorites")
           .navigationBarTitleDisplayMode(.inline)
         }
+        .scrollIndicators(.hidden)
+        .padding(.bottom, store.isCurrentlyPlaying ? 60 : 10)
         .padding(.horizontal)
       }
     }
