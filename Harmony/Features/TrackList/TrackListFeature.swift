@@ -30,8 +30,7 @@ struct TrackListFeature {
     var grammyTrackList: [TrackResponse] = GrammyWinner.tracks
     var popularArtistsState = PopularArtistsFeature.State()
     var popularGenresState = PopularGenreFeature.State()
-    @Presents
-    var destination: Destination.State?
+    @Presents var destination: Destination.State?
 
   }
 

@@ -104,7 +104,6 @@ struct TrackDetailFeature {
               try await self.favoriteService.deleteFavorite(track)
             }
           } catch: { _, error in
-            // Handle later on
             print(error)
           }
       case .trackControlAction(.infoButtonTapped):
