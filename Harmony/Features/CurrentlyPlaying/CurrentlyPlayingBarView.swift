@@ -21,7 +21,6 @@ struct CurrentlyPlayingBarView: View {
 
   var body: some View {
     HStack(spacing: 16) {
-      // Album Artwork
       LazyImage(url: URL(string: store.albumArt)) { state in
         if let image = state.image {
           image
@@ -40,7 +39,6 @@ struct CurrentlyPlayingBarView: View {
             .frame(width: 48, height: 48)
         }
       }
-      // Track info
       VStack(alignment: .leading, spacing: 2) {
         Text(store.trackName)
           .font(.headline)
@@ -54,10 +52,6 @@ struct CurrentlyPlayingBarView: View {
       
       Spacer()
       
-      Image(systemName: "hifispeaker.fill")
-        .font(.title2)
-        .foregroundColor(.white)
-      
       Button(action: {
         store.send(.playButtonTapped)
       }) {
@@ -66,6 +60,7 @@ struct CurrentlyPlayingBarView: View {
           .foregroundColor(.white)
           .padding(.leading, 8)
       }
+      .padding(.trailing, 10)
     }
     .padding(.horizontal, 4)
     .padding(.vertical, 4)
