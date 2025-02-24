@@ -39,7 +39,7 @@ struct TrackDetailFeature {
     case setMusicURL(String)
     case seek(Double)
     case updateTime(Double)
-    case setInitialTime(Double, Double)
+    case setInitialTime(Double, Double, Bool)
     case openURLResponse(TaskResult<Bool>)
     case dismissButtonTapped
     case playerControlAction(PlayerControlFeature.Action)
@@ -60,11 +60,12 @@ struct TrackDetailFeature {
         return .none
       case .setMusicURL(let url):
         return setMusicURL(&state, url: url)
-      case .setInitialTime(let current, let duration):
+      case .setInitialTime(let current, let duration, let isPlaying):
         state.currentTime = current
         state.totalDuration = duration
         state.isLoading = false
-        return .send(.playerControlAction(.playPauseTapped(true)))
+        state.playerControlState.isPlaying = isPlaying
+        return  current == 0 ? .send(.playerControlAction(.playPauseTapped(true))) : .none
       case .seek(let current):
         state.currentTime = current
         musicPlayer.seek(current)
@@ -123,8 +124,11 @@ struct TrackDetailFeature {
     state.musicURL = url
     return .run { send in
       do {
+        var current = self.musicPlayer.currentTime()
+        current = self.musicPlayer.state().currentURL  == url ? current : 0
         let duration = try await musicPlayer.setURL(url)
-        await send(.setInitialTime(musicPlayer.currentTime(), duration))
+
+        await send(.setInitialTime(current, duration, self.musicPlayer.state().isPlaying))
       } catch {
         print(error)
       }

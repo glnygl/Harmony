@@ -64,11 +64,22 @@ struct AppFeature {
       Scope(state: \.listState, action: \.listAction) { TrackListFeature() }
       Scope(state: \.favoritesState, action: \.favoritesAction) { FavoritesFeature() }
 
+      Reduce { state, action in
+        switch action {
+          case let .currentlyPlaying(.delegate(delegateAction)):
+            switch delegateAction {
+              case let .tapped(trackResponse):
+                return .send(.listAction(.listRowSelectedFromPlaying(trackResponse)))
+            }
+          default:
+            return .none
+        }
+      }
+
     }
     .ifLet(\.currentlyPlaying, action: \.currentlyPlaying) {
       CurrentlyPlayingBarFeature()
     }
-
   }
 
   private func handleTrackDetailsDismissing(_ state: inout State) -> Effect<Action> {
@@ -76,13 +87,12 @@ struct AppFeature {
         let track = trackDetailFeature.track
         let isPlaying = trackDetailFeature.playerControlState.isPlaying
         if isPlaying {
-          guard let trackName = track.trackName, let artistName = track.artistName, let albumArt = track.img else { return .none }
           state.currentlyPlaying = CurrentlyPlayingBarFeature.State(
-              trackName: trackName,
-              artistName: artistName,
-              isPlaying: true,
-              albumArt: albumArt
+            trackResponse: track,
+              isPlaying: true
           )
+        } else {
+          state.currentlyPlaying = nil
         }
         return .none
   }

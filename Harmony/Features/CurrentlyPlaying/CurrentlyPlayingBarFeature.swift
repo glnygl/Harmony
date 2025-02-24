@@ -15,25 +15,43 @@ struct CurrentlyPlayingBarFeature {
 
   @ObservableState
   struct State: Equatable {
-    var trackName: String
-    var artistName: String
+    var trackResponse: TrackResponse
     var isPlaying: Bool
-    var albumArt: String
+
+    var trackName: String {
+      self.trackResponse.trackName!
+    }
+    var artistName: String {
+      self.trackResponse.artistName!
+    }
+    var albumArt: String {
+      self.trackResponse.img!
+    }
   }
 
   enum Action: Equatable {
+    case delegate(Delegate)
     case playButtonTapped
+    case viewTapped
+
+    enum Delegate: Equatable {
+      case tapped(TrackResponse)
+    }
   }
 
   var body: some ReducerOf<Self> {
     Reduce { state, action in
       switch action {
+        case .delegate:
+          return .none
         case .playButtonTapped:
           let isPlaying = state.isPlaying
           state.isPlaying.toggle()
           return .run { _ in
             isPlaying ? self.musicPlayer.pause() : self.musicPlayer.play()
           }
+        case .viewTapped:
+          return .send(.delegate(.tapped(state.trackResponse)))
       }
     }
   }

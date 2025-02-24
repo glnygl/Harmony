@@ -73,6 +73,9 @@ struct CurrentlyPlayingBarView: View {
     .cornerRadius(8)
     .shadow(radius: 2)
     .padding(.horizontal, 4)
+    .onTapGesture {
+      self.store.send(.viewTapped)
+    }
   }
 }
 
@@ -81,12 +84,19 @@ struct CurrentlyPlayingBarView: View {
   CurrentlyPlayingBarView(
     store: .init(
       initialState: CurrentlyPlayingBarFeature.State.init(
-        trackName: "Revolution",
-        artistName: "Måns Zelmerlöw",
-        isPlaying: true,
-        albumArt: ""
+        trackResponse: .init(
+          id: 1,
+          img: "img",
+          url: "url",
+          trackName: "Name",
+          artistName: "Artist Name",
+          collectionName: "collection",
+          infoURL: "infoURL"
+        ),
+        isPlaying: true
       ),
-      reducer: { CurrentlyPlayingBarFeature() }
+      reducer: { CurrentlyPlayingBarFeature()
+      }
     )
   )
 }
