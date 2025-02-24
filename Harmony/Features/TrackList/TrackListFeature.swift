@@ -38,7 +38,6 @@ struct TrackListFeature {
   enum Action: BindableAction {
     case binding(BindingAction<State>)
     case destination(PresentationAction<Destination.Action>)
-    case listRowSelectedFromPlaying(TrackResponse)
     case listRowSelected(TrackResponse)
     case searchTrackList
     case cancelSearch
@@ -64,9 +63,6 @@ struct TrackListFeature {
         return performSearch(&state)
       case .listRowSelected(let track):
         state.destination = .details(TrackDetailFeature.State(track: track))
-        return .none
-      case let .listRowSelectedFromPlaying(track):
-          state.destination = .details(TrackDetailFeature.State(track: track))
         return .none
       case .setTrackListResponse(.success(let response)):
         updateLoadingState(&state, isLoading: false)

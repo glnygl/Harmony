@@ -60,7 +60,7 @@ struct AppFeature {
         case let .currentlyPlaying(.delegate(delegateAction)):
           switch delegateAction {
             case let .tapped(trackResponse):
-              return .send(.listAction(.listRowSelectedFromPlaying(trackResponse)))
+              return .send(.listAction(.listRowSelected(trackResponse)))
           }
         default:
           return .none
@@ -74,12 +74,12 @@ struct AppFeature {
 
   private func handleTrackDetailsDismissing(_ state: inout State) -> Effect<Action> {
     guard let trackDetailFeature = state.trackDetailFeature else { return .none }
-        let track = trackDetailFeature.track
-        let isPlaying = trackDetailFeature.playerControlState.isPlaying
-          state.currentlyPlaying = CurrentlyPlayingBarFeature.State(
-            trackResponse: track,
-              isPlaying: isPlaying
-          )
-        return .none
+    let track = trackDetailFeature.track
+    let isPlaying = trackDetailFeature.playerControlState.isPlaying
+    state.currentlyPlaying = CurrentlyPlayingBarFeature.State(
+      trackResponse: track,
+      isPlaying: isPlaying
+    )
+    return .none
   }
 }
