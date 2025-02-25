@@ -21,7 +21,6 @@ struct TrackControlFeature {
 
     init(trackId: Int) {
       self.trackId = trackId
-
       _isFavorite = SharedReader(wrappedValue: false, .fetch(Exists(trackId: Int64(trackId))))
     }
   }

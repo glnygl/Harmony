@@ -14,7 +14,8 @@ struct TrackDetailFeature {
   @Dependency(\.openURL) var openURL
   @Dependency(\.musicPlayer) var musicPlayer
   @Dependency(\.favoriteService) var favoriteService
-  
+  @Dependency(\.dismiss) var dismiss
+
   @ObservableState
   struct State: Equatable {
     var track: TrackResponse
@@ -36,9 +37,8 @@ struct TrackDetailFeature {
   enum Action: BindableAction {
     case binding(BindingAction<State>)
     case setMusicURL(String)
-    case seek(Double)
     case updateTime(Double)
-    case setInitialTime(Double, Double)
+    case setInitialTime(Double, Double, Bool)
     case openURLResponse(TaskResult<Bool>)
     case dismissButtonTapped
     case playerControlAction(PlayerControlFeature.Action)
@@ -55,21 +55,19 @@ struct TrackDetailFeature {
     
     Reduce { state, action in
       switch action {
-      case .binding(\.showPopover):
-        return .none
-      case .binding(_):
+        case .binding(\.currentTime):
+          musicPlayer.seek(state.currentTime)
+          return .none
+      case .binding:
         return .none
       case .setMusicURL(let url):
         return setMusicURL(&state, url: url)
-      case .setInitialTime(let current, let duration):
+      case .setInitialTime(let current, let duration, let isPlaying):
         state.currentTime = current
         state.totalDuration = duration
         state.isLoading = false
-        return .send(.playerControlAction(.playPauseTapped(true)))
-      case .seek(let current):
-        state.currentTime = current
-        musicPlayer.seek(current)
-        return .none
+        state.playerControlState.isPlaying = isPlaying
+        return  current == 0 ? .send(.playerControlAction(.playPauseTapped(true))) : .none
       case let .updateTime(time):
         return setCurrentTime(&state, time: time)
       case .openURLResponse(.success(_)):
@@ -78,10 +76,10 @@ struct TrackDetailFeature {
       case .openURLResponse(.failure(_)):
         return .none
       case .dismissButtonTapped:
-        musicPlayer.pause()
-        return .none
+          return .run { _ in await self.dismiss() }
       case .playerControlAction(.playPauseTapped(let shouldPlay)):
         if shouldPlay {
+          musicPlayer.seek(state.currentTime)
           musicPlayer.play()
         } else {
           musicPlayer.pause()
@@ -104,7 +102,6 @@ struct TrackDetailFeature {
               try await self.favoriteService.deleteFavorite(track)
             }
           } catch: { _, error in
-            // Handle later on
             print(error)
           }
       case .trackControlAction(.infoButtonTapped):
@@ -125,8 +122,10 @@ struct TrackDetailFeature {
     state.musicURL = url
     return .run { send in
       do {
+        var current = self.musicPlayer.currentTime()
+        current = self.musicPlayer.state().currentURL  == url ? current : 0
         let duration = try await musicPlayer.setURL(url)
-        await send(.setInitialTime(musicPlayer.currentTime(), duration))
+        await send(.setInitialTime(current, duration, self.musicPlayer.state().isPlaying))
       } catch {
         print(error)
       }
@@ -142,7 +141,7 @@ struct TrackDetailFeature {
       }
       
       return .run { send in
-        await send(.seek(0))
+        await send(.set(\.currentTime, 0))
         await send(.playerControlAction(.playPauseTapped(!shouldPause)))
       }
     }

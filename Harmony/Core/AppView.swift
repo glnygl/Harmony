@@ -24,6 +24,15 @@ struct AppView: View {
             Label("Favorites", systemImage: "heart")
           }
       }
+      .overlay(alignment: .bottom) {
+        if let store = store.scope(
+          state: \.currentlyPlayingState,
+          action: \.currentlyPlayingAction
+        ) {
+          CurrentlyPlayingView(store: store)
+            .padding(.bottom, 55)
+        }
+      }
     }
 }
 

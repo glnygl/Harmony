@@ -15,6 +15,12 @@ enum MusicPlayerError: LocalizedError {
 }
 
 struct MusicPlayerService {
+
+  struct State: Equatable, Sendable {
+    var isPlaying: Bool
+    var currentURL: String
+  }
+
   var play: @Sendable () -> Void
   var pause: @Sendable () -> Void
   var setVolume: @Sendable (Double) -> Void
@@ -22,18 +28,23 @@ struct MusicPlayerService {
   var currentTime: @Sendable () -> Double
   var duration: @Sendable () -> Double
   var setURL: @Sendable (String) async throws -> Double
+
+  var state: @Sendable () -> State
 }
 
 extension MusicPlayerService {
 
   static var liveValue: MusicPlayerService {
+    let _state = LockIsolated(State(isPlaying: false, currentURL: ""))
     let player = AVPlayer()
     return Self(
       play: {
         player.play()
+        _state.setValue(.init(isPlaying: true, currentURL: _state.currentURL))
       },
       pause: {
         player.pause()
+        _state.setValue(.init(isPlaying:false, currentURL: _state.currentURL))
       },
       setVolume: { volume in
         player.volume = Float(volume)
@@ -54,6 +65,11 @@ extension MusicPlayerService {
         }
 
         let playerItem = AVPlayerItem(url: url)
+        if _state.value.isPlaying && urlString == _state.value.currentURL {
+          return player.currentItem?.duration.seconds ?? 0
+        }
+        _state.setValue(.init(isPlaying: _state.isPlaying, currentURL: urlString))
+
         player.replaceCurrentItem(with: playerItem)
 
           return try await withCheckedThrowingContinuation { continuation in
@@ -75,7 +91,9 @@ extension MusicPlayerService {
               }
               }
           }
-      }
+      },
+
+      state: { _state.value }
     )
   }
 }

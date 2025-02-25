@@ -18,6 +18,7 @@ struct FavoritesFeature {
     @SharedReader(.fetch(TrackList(limit: 10, offset: 0), animation: .default))
     var trackList: [TrackResponse] =  []
     var error: String = ""
+    var isCurrentlyPlaying = false
     @Presents var trackDetailState: TrackDetailFeature.State?
   }
 
@@ -46,11 +47,8 @@ struct FavoritesFeature {
       case .listRowSelected(let track):
         state.trackDetailState = TrackDetailFeature.State(track: track)
         return .none
-      case .showTrackDetail(.presented(.dismissButtonTapped)):
-        state.trackDetailState = nil
-        return .none
-      default:
-        return .none
+      case .showTrackDetail:
+          return .none
       }
     }
     .ifLet(\.$trackDetailState, action: \.showTrackDetail) { TrackDetailFeature() }
