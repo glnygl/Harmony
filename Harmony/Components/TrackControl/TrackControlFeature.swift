@@ -17,7 +17,7 @@ struct TrackControlFeature {
     @SharedReader
     var isFavorite: Bool
     var isMute: Bool = false
-    @Shared(.inMemory("playStatus"))
+    @Shared(.trackPlayStatus)
     var playStatus: PlayStatus = .once
 
     init(trackId: Int) {
