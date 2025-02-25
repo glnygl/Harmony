@@ -127,7 +127,7 @@ struct TrackDetailFeature {
     return .run { send in
       do {
         var current = self.musicPlayer.currentTime()
-        current = self.musicPlayer.state().currentURL  == url ? current : 0
+        current = self.musicPlayer.state().currentURL == url ? current : 0
         let duration = try await musicPlayer.setURL(url)
         await send(.setInitialTime(current, duration, self.musicPlayer.state().isPlaying))
       } catch {
@@ -184,8 +184,6 @@ struct TrackDetailFeature {
     return .send(.volumeControlAction(.updateVolume(state.volumeControlState.volume)))
   }
 }
-
-
 
 extension SharedKey where Self == InMemoryKey<Double>.Default {
   static var trackDuration: Self {

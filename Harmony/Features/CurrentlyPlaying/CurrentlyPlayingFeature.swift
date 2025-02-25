@@ -50,6 +50,7 @@ struct CurrentlyPlayingFeature {
         case .playButtonTapped:
           let isPlaying = state.isPlaying
           state.isPlaying.toggle()
+          self.musicPlayer.seek(state.currentTime)
           return .run { _ in
             isPlaying ? self.musicPlayer.pause() : self.musicPlayer.play()
           }
