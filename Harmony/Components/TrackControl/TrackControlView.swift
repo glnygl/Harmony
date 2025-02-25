@@ -47,7 +47,7 @@ struct TrackControlView: View {
         }
 
         Button(action: {
-          store.send(.setPlayStatus(store.playStatus))
+          store.send(.setPlayStatus)
         }) {
           Image(systemName: store.playStatus == .forever ? "arrow.trianglehead.2.clockwise" : "arrow.trianglehead.counterclockwise")
             .id(store.playStatus)
