@@ -22,14 +22,14 @@ struct TrackDetailFeature {
     var musicURL: String? = nil
     var isLoading: Bool = true
     var showPopover: Bool = false
-    @Shared(.inMemory("currentTime"))
-    var currentTime: Double = 0
-    @Shared(.inMemory("duration"))
-    var totalDuration: Double = 0
+    @Shared(.trackCurrentTime)
+    var currentTime: Double
+    @Shared(.trackDuration)
+    var totalDuration: Double
     var playerControlState = PlayerControlFeature.State()
     var trackControlState: TrackControlFeature.State
     var volumeControlState = VolumeControlFeature.State()
-    @Shared(.inMemory("playStatus"))
+    @Shared(.trackPlayStatus)
     var playStatus: PlayStatus = .once
 
 
@@ -184,3 +184,18 @@ struct TrackDetailFeature {
     return .send(.volumeControlAction(.updateVolume(state.volumeControlState.volume)))
   }
 }
+
+
+
+extension SharedKey where Self == InMemoryKey<Double>.Default {
+  static var trackDuration: Self {
+    Self[.inMemory("trackDuration"), default: 0]
+  }
+}
+
+extension SharedKey where Self == InMemoryKey<Double>.Default {
+  static var trackCurrentTime: Self {
+    Self[.inMemory("trackCurrentTime"), default: 0]
+  }
+}
+

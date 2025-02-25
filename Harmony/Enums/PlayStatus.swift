@@ -5,6 +5,8 @@
 //  Created by Glny Gl on 10/02/2025.
 //
 
+import Sharing
+
 enum PlayStatus: Hashable {
   case once
   case again
@@ -16,5 +18,11 @@ enum PlayStatus: Hashable {
       case .again: .forever
       case .forever: .once
     }
+  }
+}
+
+extension SharedKey where Self == InMemoryKey<PlayStatus>.Default {
+  static var trackPlayStatus: Self {
+    Self[.inMemory("trackPlayStatus"), default: .once]
   }
 }

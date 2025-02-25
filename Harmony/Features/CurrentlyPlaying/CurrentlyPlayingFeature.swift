@@ -17,12 +17,11 @@ struct CurrentlyPlayingFeature {
   struct State: Equatable {
     var trackResponse: TrackResponse
     var isPlaying: Bool
-    @Shared(.inMemory("duration"))
+    @Shared(.trackDuration)
     var duration: Double = 0.0
-    @Shared(.inMemory("currentTime"))
-    var currentTime: Double = 0.0
-
-    @Shared(.inMemory("playStatus"))
+    @Shared(.trackCurrentTime)
+    var currentTime: Double
+    @Shared(.trackPlayStatus)
     var playStatus: PlayStatus = .once
 
   }
