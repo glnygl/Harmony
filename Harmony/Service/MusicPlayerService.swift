@@ -19,6 +19,19 @@ struct MusicPlayerService {
   struct State: Equatable, Sendable {
     var isPlaying: Bool
     var currentURL: String
+    var currentTime: Double
+
+    func set(isPlaying: Bool) -> Self {
+      .init(isPlaying: isPlaying, currentURL: currentURL, currentTime: currentTime)
+    }
+
+    func set(currentTime: Double) -> Self {
+      .init(isPlaying: isPlaying, currentURL: currentURL, currentTime: currentTime)
+    }
+
+    func set(currentURL: String) -> Self {
+      .init(isPlaying: isPlaying, currentURL: currentURL, currentTime: currentTime)
+    }
   }
 
   var play: @Sendable () -> Void
@@ -35,26 +48,27 @@ struct MusicPlayerService {
 extension MusicPlayerService {
 
   static var liveValue: MusicPlayerService {
-    let _state = LockIsolated(State(isPlaying: false, currentURL: ""))
+    let _state = LockIsolated(State(isPlaying: false, currentURL: "", currentTime: 0))
     let player = AVPlayer()
     return Self(
       play: {
         player.play()
-        _state.setValue(.init(isPlaying: true, currentURL: _state.currentURL))
+        _state.withValue { $0 = $0.set(isPlaying: true) }
       },
       pause: {
         player.pause()
-        _state.setValue(.init(isPlaying:false, currentURL: _state.currentURL))
+        _state.withValue { $0 = $0.set(isPlaying: false) }
       },
       setVolume: { volume in
         player.volume = Float(volume)
       },
       seek: { time in
+        _state.withValue { $0 = $0.set(currentTime: time) }
         let cmTime = CMTime(seconds: time, preferredTimescale: 600)
         player.seek(to: cmTime)
       },
       currentTime: {
-        player.currentItem?.currentTime().seconds ?? 0
+        _state.value.currentTime
       },
       duration: {
         player.currentItem?.duration.seconds ?? 0
@@ -68,7 +82,7 @@ extension MusicPlayerService {
         if _state.value.isPlaying && urlString == _state.value.currentURL {
           return player.currentItem?.duration.seconds ?? 0
         }
-        _state.setValue(.init(isPlaying: _state.isPlaying, currentURL: urlString))
+        _state.withValue { $0 = $0.set(currentURL: urlString) }
 
         player.replaceCurrentItem(with: playerItem)
 

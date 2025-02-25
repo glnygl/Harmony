@@ -143,7 +143,7 @@ struct TrackDetailFeature {
       if state.playStatus == .again {
           state.$playStatus.withLock { $0 = .once }
       }
-      
+
       return .run { send in
         await send(.set(\.currentTime, 0))
         await send(.playerControlAction(.playPauseTapped(!shouldPause)))
