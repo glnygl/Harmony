@@ -40,12 +40,9 @@ struct TrackDetailView: View {
         .clipShape(RoundedRectangle(cornerRadius: 12))
 
         Slider(
-          value: Binding<Double>(
-            get: { self.store.state.currentTime },
-            set: { newValue in
-              self.store.send(.seek(newValue))
-            }
-          ), in: 0...store.totalDuration
+          value:
+            self.$store.currentTime,
+            in: 0...store.totalDuration
         )
         .accentColor(.gray)
         .padding(.horizontal, 10)

@@ -37,7 +37,6 @@ struct TrackDetailFeature {
   enum Action: BindableAction {
     case binding(BindingAction<State>)
     case setMusicURL(String)
-    case seek(Double)
     case updateTime(Double)
     case setInitialTime(Double, Double, Bool)
     case openURLResponse(TaskResult<Bool>)
@@ -56,6 +55,9 @@ struct TrackDetailFeature {
     
     Reduce { state, action in
       switch action {
+        case .binding(\.currentTime):
+          musicPlayer.seek(state.currentTime)
+          return .none
       case .binding:
         return .none
       case .setMusicURL(let url):
@@ -66,10 +68,6 @@ struct TrackDetailFeature {
         state.isLoading = false
         state.playerControlState.isPlaying = isPlaying
         return  current == 0 ? .send(.playerControlAction(.playPauseTapped(true))) : .none
-      case .seek(let current):
-        state.currentTime = current
-        musicPlayer.seek(current)
-        return .none
       case let .updateTime(time):
         return setCurrentTime(&state, time: time)
       case .openURLResponse(.success(_)):
@@ -143,7 +141,7 @@ struct TrackDetailFeature {
       }
       
       return .run { send in
-        await send(.seek(0))
+        await send(.set(\.currentTime, 0))
         await send(.playerControlAction(.playPauseTapped(!shouldPause)))
       }
     }
