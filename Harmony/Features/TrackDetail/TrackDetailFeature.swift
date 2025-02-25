@@ -22,11 +22,16 @@ struct TrackDetailFeature {
     var musicURL: String? = nil
     var isLoading: Bool = true
     var showPopover: Bool = false
+    @Shared(.inMemory("currentTime"))
     var currentTime: Double = 0
+    @Shared(.inMemory("duration"))
     var totalDuration: Double = 0
     var playerControlState = PlayerControlFeature.State()
     var trackControlState: TrackControlFeature.State
     var volumeControlState = VolumeControlFeature.State()
+    @Shared(.inMemory("playStatus"))
+    var playStatus: PlayStatus = .once
+
 
     init(track: TrackResponse) {
       self.track = track
@@ -63,8 +68,8 @@ struct TrackDetailFeature {
       case .setMusicURL(let url):
         return setMusicURL(&state, url: url)
       case .setInitialTime(let current, let duration, let isPlaying):
-        state.currentTime = current
-        state.totalDuration = duration
+        state.$currentTime.withLock { $0 = current }
+        state.$totalDuration.withLock { $0 = duration }
         state.isLoading = false
         state.playerControlState.isPlaying = isPlaying
         return  current == 0 ? .send(.playerControlAction(.playPauseTapped(true))) : .none
@@ -91,7 +96,7 @@ struct TrackDetailFeature {
       case .playerControlAction(.forwardTapped):
         setForwardState(&state, isRewind: false)
         return .none
-      case .trackControlAction(.setPlayStatus(_)):
+      case .trackControlAction(.setPlayStatus):
         return .none
         case let .trackControlAction(.favoriteButtonTapped(isFavorite)):
           let track = state.track
@@ -115,7 +120,6 @@ struct TrackDetailFeature {
         return .none
       }
     }
-
   }
   
   private func setMusicURL(_ state: inout State, url: String) -> Effect<Action> {
@@ -133,11 +137,11 @@ struct TrackDetailFeature {
   }
   
   private func setCurrentTime(_ state: inout State, time: Double) -> Effect<Action> {
-    state.currentTime = time
+    state.$currentTime.withLock { $0 = time }
     if time >= state.totalDuration {
-      let shouldPause = (state.trackControlState.playStatus == .once)
-      if state.trackControlState.playStatus == .again {
-        state.trackControlState.playStatus = .once
+      let shouldPause = (state.playStatus == .once)
+      if state.playStatus == .again {
+          state.$playStatus.withLock { $0 = .once }
       }
       
       return .run { send in
@@ -150,9 +154,9 @@ struct TrackDetailFeature {
   
   private func setForwardState(_ state: inout State, isRewind: Bool) {
     if isRewind {
-      state.currentTime = max(0, state.currentTime - 10)
+      state.$currentTime.withLock { $0 = max(0, $0 - 10) }
     } else if state.currentTime + 10 <= state.totalDuration {
-      state.currentTime += 10
+      state.$currentTime.withLock { $0 += 10 }
     }
     musicPlayer.seek(state.currentTime)
   }

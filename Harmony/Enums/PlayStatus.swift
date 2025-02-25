@@ -5,19 +5,16 @@
 //  Created by Glny Gl on 10/02/2025.
 //
 
-enum PlayStatus {
+enum PlayStatus: Hashable {
   case once
   case again
   case forever
-
-  mutating func next() {
-      switch self {
-      case .once:
-          self = .again
-      case .again:
-          self = .forever
-      case .forever:
-          self = .once
-      }
+  
+  func next() -> PlayStatus {
+    switch self {
+      case .once: .again
+      case .again: .forever
+      case .forever: .once
+    }
   }
 }

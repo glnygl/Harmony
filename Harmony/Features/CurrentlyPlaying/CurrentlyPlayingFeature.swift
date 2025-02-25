@@ -17,14 +17,23 @@ struct CurrentlyPlayingFeature {
   struct State: Equatable {
     var trackResponse: TrackResponse
     var isPlaying: Bool
+    @Shared(.inMemory("duration"))
+    var duration: Double = 0.0
+    @Shared(.inMemory("currentTime"))
+    var currentTime: Double = 0.0
+
+    @Shared(.inMemory("playStatus"))
+    var playStatus: PlayStatus = .once
+
   }
 
-  enum Action: Equatable {
+  enum Action: Equatable, BindableAction {
+    case binding(BindingAction<State>)
     case delegate(Delegate)
     case playButtonTapped
-    case viewTapped
-    case updateTime
     case seek(Double)
+    case updateTime
+    case viewTapped
 
     enum Delegate: Equatable {
       case tapped(TrackResponse)
@@ -32,8 +41,11 @@ struct CurrentlyPlayingFeature {
   }
 
   var body: some ReducerOf<Self> {
+    BindingReducer()
     Reduce { state, action in
       switch action {
+        case .binding:
+          return .none
         case .delegate:
           return .none
         case .playButtonTapped:
@@ -44,19 +56,26 @@ struct CurrentlyPlayingFeature {
           }
         case .viewTapped:
           return .send(.delegate(.tapped(state.trackResponse)))
-      case .updateTime:
-        let currentTime = musicPlayer.currentTime()
-        let duration = musicPlayer.duration()
-        if currentTime >= duration {
-          return .run { send in
-            await send(.seek(0))
-            await send(.playButtonTapped)
+        case .updateTime:
+          let currentTime = musicPlayer.currentTime()
+          state.$currentTime.withLock { $0 = currentTime }
+          let duration = musicPlayer.duration()
+          
+          if currentTime >= duration {
+            let shouldPause = (state.playStatus == .once)
+            if state.playStatus == .again {
+              state.$playStatus.withLock { $0 = .once }
+            }
+            state.isPlaying = shouldPause
+            return .run { send in
+              await send(.seek(0))
+              await send(.playButtonTapped)
+            }
           }
-        }
-        return .none
-      case .seek(let time):
-        musicPlayer.seek(time)
-        return .none
+          return .none
+        case let .seek(time):
+          musicPlayer.seek(time)
+          return .none
       }
     }
   }
