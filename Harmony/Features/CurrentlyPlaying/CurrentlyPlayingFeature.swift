@@ -17,6 +17,9 @@ struct CurrentlyPlayingFeature {
   struct State: Equatable {
     var trackResponse: TrackResponse
     var isPlaying: Bool
+
+    @Shared(.trackPlayStatus)
+    var playStatus: PlayStatus = .once
   }
 
   enum Action: Equatable {
@@ -48,6 +51,11 @@ struct CurrentlyPlayingFeature {
         let currentTime = musicPlayer.currentTime()
         let duration = musicPlayer.duration()
         if currentTime >= duration {
+          let shouldPause = (state.playStatus == .once)
+          if state.playStatus == .again {
+            state.$playStatus.withLock { $0 = .once }
+          }
+          state.isPlaying = shouldPause
           return .run { send in
             await send(.seek(0))
             await send(.playButtonTapped)

@@ -17,6 +17,7 @@ struct TrackControlFeature {
     @SharedReader
     var isFavorite: Bool
     var isMute: Bool = false
+    @Shared(.trackPlayStatus)
     var playStatus: PlayStatus = .once
 
     init(trackId: Int) {
@@ -35,7 +36,7 @@ struct TrackControlFeature {
   enum Action {
     case infoButtonTapped
     case muteVolume(Bool)
-    case setPlayStatus(PlayStatus)
+    case setPlayStatus
     case favoriteButtonTapped(Bool)
   }
 
@@ -44,9 +45,9 @@ struct TrackControlFeature {
       switch action {
       case .favoriteButtonTapped:
           return .none
-      case .setPlayStatus(var status):
-        status.next()
-        state.playStatus = status
+      case .setPlayStatus:
+        let new = state.playStatus.next()
+        state.$playStatus.withLock { $0 = new }
         return .none
       case .muteVolume(let value):
         state.isMute = value

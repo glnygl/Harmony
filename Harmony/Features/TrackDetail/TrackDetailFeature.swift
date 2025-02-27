@@ -28,6 +28,9 @@ struct TrackDetailFeature {
     var trackControlState: TrackControlFeature.State
     var volumeControlState = VolumeControlFeature.State()
 
+    @Shared(.trackPlayStatus)
+    var playStatus: PlayStatus = .once
+
     init(track: TrackResponse) {
       self.track = track
       self.trackControlState = .init(trackId: track.id)
@@ -91,7 +94,7 @@ struct TrackDetailFeature {
       case .playerControlAction(.forwardTapped):
         setForwardState(&state, isRewind: false)
         return .none
-      case .trackControlAction(.setPlayStatus(_)):
+      case .trackControlAction(.setPlayStatus):
         return .none
         case let .trackControlAction(.favoriteButtonTapped(isFavorite)):
           let track = state.track
@@ -135,11 +138,12 @@ struct TrackDetailFeature {
   private func setCurrentTime(_ state: inout State, time: Double) -> Effect<Action> {
     state.currentTime = time
     if time >= state.totalDuration {
-      let shouldPause = (state.trackControlState.playStatus == .once)
-      if state.trackControlState.playStatus == .again {
-        state.trackControlState.playStatus = .once
-      }
       
+      let shouldPause = (state.playStatus == .once)
+      if state.playStatus == .again {
+          state.$playStatus.withLock { $0 = .once }
+      }
+
       return .run { send in
         await send(.set(\.currentTime, 0))
         await send(.playerControlAction(.playPauseTapped(!shouldPause)))
