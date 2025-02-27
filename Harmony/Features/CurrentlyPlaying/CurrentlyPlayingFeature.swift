@@ -17,7 +17,10 @@ struct CurrentlyPlayingFeature {
   struct State: Equatable {
     var trackResponse: TrackResponse
     var isPlaying: Bool
-
+    @Shared(.trackDuration)
+    var duration: Double = 0.0
+    @Shared(.trackCurrentTime)
+    var currentTime: Double
     @Shared(.trackPlayStatus)
     var playStatus: PlayStatus = .once
   }
@@ -49,6 +52,7 @@ struct CurrentlyPlayingFeature {
           return .send(.delegate(.tapped(state.trackResponse)))
       case .updateTime:
         let currentTime = musicPlayer.currentTime()
+        state.$currentTime.withLock { $0 = currentTime }
         let duration = musicPlayer.duration()
         if currentTime >= duration {
           let shouldPause = (state.playStatus == .once)
@@ -59,6 +63,7 @@ struct CurrentlyPlayingFeature {
           return .run { send in
             await send(.seek(0))
             await send(.playButtonTapped)
+            await send(.updateTime)
           }
         }
         return .none
@@ -70,4 +75,14 @@ struct CurrentlyPlayingFeature {
   }
 }
 
+extension SharedKey where Self == InMemoryKey<Double>.Default {
+  static var trackDuration: Self {
+    Self[.inMemory("trackDuration"), default: 0]
+  }
+}
 
+extension SharedKey where Self == InMemoryKey<Double>.Default {
+  static var trackCurrentTime: Self {
+    Self[.inMemory("trackCurrentTime"), default: 0]
+  }
+}
