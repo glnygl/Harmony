@@ -64,12 +64,13 @@ extension MusicPlayerService {
           throw MusicPlayerError.invalidURL
         }
 
-        let playerItem = AVPlayerItem(url: url)
-        if _state.value.isPlaying && urlString == _state.value.currentURL {
+        if urlString == _state.value.currentURL && player.currentItem != nil {
           return player.currentItem?.duration.seconds ?? 0
         }
+
         _state.setValue(.init(isPlaying: _state.isPlaying, currentURL: urlString))
 
+        let playerItem = AVPlayerItem(url: url)
         player.replaceCurrentItem(with: playerItem)
 
           return try await withCheckedThrowingContinuation { continuation in
